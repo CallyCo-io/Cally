@@ -21,12 +21,41 @@ development = [
   "black",
   "isort",
   "mypy",
+  "pytest",
+  "pytest-black",
+  "pytest-mypy",
+  "pytest-ruff",
+  "ruff",
+  "types-PyYAML",
+]
+test = [
+  "black",
+  "mypy",
+  "pytest",
+  "pytest-black",
+  "pytest-mypy",
+  "pytest-ruff",
   "ruff",
   "types-PyYAML",
 ]
 
 [project.scripts]
 cally = "cally.cli:cally"
+
+[tool.black]
+skip-string-normalization = true
+
+[tool.isort]
+profile = "black"
+src_paths = ["cally", "tests"]
+
+[tool.pytest.ini_options]
+addopts = "-p no:cacheprovider --black --mypy"
+filterwarnings = [
+    "ignore",
+    "default:::cally.*",
+    "default:::tests.*"
+]
 
 [tool.setuptools.dynamic]
 version = {attr = "cally.__version__"}
@@ -46,7 +75,8 @@ select = [
     "PTH", # pathlib
     "RUF", # ruff
 ]
-
-[tool.isort]
-profile = "black"
-src_paths = ["cally", "tests"]
+[tool.ruff.lint.per-file-ignores]
+"cally/tools/provider.py" = [
+    "S404",  # `subprocess` module is possibly insecure - used for 'cdktf get'
+    "S602"  # `subprocess` call with `shell=True` identified - required for 'cdktf get'
+]

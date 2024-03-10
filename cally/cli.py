@@ -37,7 +37,9 @@ def get_commands(class_obj: ModuleType) -> List:
 @click.version_option(VERSION)
 @click.pass_context
 def cally(
-    ctx: click.Context, core_config: click.Path, project_config: click.Path
+    ctx: click.Context,  # noqa: ARG001
+    core_config: click.Path,  # noqa: ARG001
+    project_config: click.Path,  # noqa: ARG001
 ) -> None:
     """
     Top level click command group for Cally
