@@ -2,7 +2,8 @@ from pathlib import Path
 
 import click
 
-from . import __version__
+from . import commands as builtin_commands
+from ._version import VERSION
 
 
 @click.group()
@@ -20,7 +21,7 @@ from . import __version__
     envvar='CALLY_PROJECT_CONFIG',
     help='Path to the project config file',
 )
-@click.version_option(__version__)
+@click.version_option(VERSION)
 @click.pass_context
 def cally(
     ctx: click.Context, core_config: click.Path, project_config: click.Path
