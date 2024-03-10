@@ -20,6 +20,7 @@ license = {file = "LICENSE.md"}
 [project.optional-dependencies]
 development = [
   "black",
+  "coverage",
   "isort",
   "mypy",
   "pytest",
@@ -31,6 +32,7 @@ development = [
 ]
 test = [
   "black",
+  "coverage",
   "mypy",
   "pytest",
   "pytest-black",
