@@ -1,0 +1,26 @@
+name: Test
+
+on:
+  push:
+    branches-ignore:
+      - main
+
+jobs:
+  pytest:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python: ["3.11"]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+          cache: pip
+      - name: Install Cally test dependencies
+        run: pip install .[test]
+      - name: Run Ruff # pytest-ruff not picking up pyproject config
+        run: ruff check .
+      - name: Run Pytest
+        run: pytest -v

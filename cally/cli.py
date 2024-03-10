@@ -1,8 +1,22 @@
 from pathlib import Path
+from types import ModuleType
+from typing import List
 
 import click
 
-from . import __version__
+from . import commands as builtin_commands
+from ._version import VERSION
+
+
+def get_commands(class_obj: ModuleType) -> List:
+    """
+    Convenience method for collecting all available commands
+    """
+    return [
+        val
+        for (key, val) in vars(class_obj).items()
+        if isinstance(val, click.core.Command)
+    ]
 
 
 @click.group()
@@ -20,11 +34,17 @@ from . import __version__
     envvar='CALLY_PROJECT_CONFIG',
     help='Path to the project config file',
 )
-@click.version_option(__version__)
+@click.version_option(VERSION)
 @click.pass_context
 def cally(
-    ctx: click.Context, core_config: click.Path, project_config: click.Path
+    ctx: click.Context,  # noqa: ARG001
+    core_config: click.Path,  # noqa: ARG001
+    project_config: click.Path,  # noqa: ARG001
 ) -> None:
     """
     Top level click command group for Cally
     """
+
+
+for command in get_commands(builtin_commands):
+    cally.add_command(command)
