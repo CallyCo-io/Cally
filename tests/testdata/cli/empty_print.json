@@ -1,0 +1,18 @@
+{
+    "//": {
+      "metadata": {
+        "backend": "local",
+        "stackName": "test-cli",
+        "version": "0.20.4"
+      },
+      "outputs": {
+      }
+    },
+    "terraform": {
+      "backend": {
+        "local": {
+          "path": "state/test-cli.tfstate"
+        }
+      }
+    }
+}

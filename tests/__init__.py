@@ -1,7 +1,10 @@
+import json
 import os
 from pathlib import Path
 from tempfile import TemporaryDirectory
 from unittest import TestCase, mock
+
+from cally.cdktf import CallyStack
 
 
 class CallyTestHarness(TestCase):
@@ -20,8 +23,27 @@ class CallyTestHarness(TestCase):
             clear=True,
         )
         self.env_patcher.start()
+        os.chdir(self.working.name)
 
     def tearDown(self):
         self.env_patcher.stop()
         self.working.cleanup()
         os.chdir(self.current_working)
+
+    @staticmethod
+    def get_test_file(filename) -> Path:
+        return Path(Path(__file__).parent, 'testdata', filename)
+
+    def load_test_file(self, filename) -> str:
+        return self.get_test_file(filename).read_text()
+
+    def load_json_file(self, filename) -> dict:
+        return json.loads(self.load_test_file(filename))
+
+
+class CallyTfTestHarness(CallyTestHarness):
+
+    def synth_stack(self, stack: CallyStack) -> dict:
+        stack.synth_stack(self.working.name)
+        output_file = Path(self.working.name, 'stacks', stack.name, 'cdk.tf.json')
+        return json.loads(output_file.read_text())
