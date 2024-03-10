@@ -1,0 +1,43 @@
+{
+	"folders": [
+		{
+			"path": "."
+		}
+	],
+	"settings": {
+		"python.defaultInterpreterPath": "${workspaceFolder:cally}/venv/bin/python",
+		"files.exclude": {
+			"**/__pycache__": true,
+		},
+		"files.watcherExclude": {
+			"**/.pytest_cache": true,
+			"**/.mypy_cache": true,
+			"**/*egg*": true,
+			"**/venv": true
+		},
+		"python.testing.pytestEnabled": false,
+		"python.testing.unittestEnabled": true,
+		"files.trimTrailingWhitespace": true,
+		"files.insertFinalNewline": true,
+		"files.trimFinalNewlines": true,
+		"black-formatter.args": ["--skip-string-normalization"],
+		"isort.args": ["--profile", "black"],
+		"[python]": {
+			"editor.defaultFormatter": "ms-python.black-formatter",
+			"editor.formatOnSave": true,
+			"editor.codeActionsOnSave": {
+				"source.organizeImports": "explicit"
+			}
+		}
+	},
+	"extensions": {
+		"recommendations": [
+			"charliermarsh.ruff",
+			"ms-python.black-formatter",
+			"ms-python.isort",
+			"ms-python.mypy-type-checker",
+			"ms-python.python",
+			"redhat.vscode-yaml",
+		]
+	}
+}

@@ -1,0 +1,52 @@
+[build-system]
+requires = ["setuptools", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "cally"
+dynamic = ["version"]
+dependencies = [
+  "click",
+]
+requires-python = ">=3.8"
+authors = [
+  {name = "Leon Wright", email = "techman83@gmail.com"},
+]
+description = "A config as infrastructure foundation for your Internal Developer Platform"
+readme = "README.md"
+license = {file = "LICENSE.md"}
+
+[project.optional-dependencies]
+development = [
+  "black",
+  "isort",
+  "mypy",
+  "ruff",
+  "types-PyYAML",
+]
+
+[project.scripts]
+cally = "cally.cli:cally"
+
+[tool.setuptools.dynamic]
+version = {attr = "cally.__version__"}
+
+[tool.ruff]
+preview = true
+
+[tool.ruff.lint]
+select = [
+    # flake8
+    "A", "ARG", "B", "BLE", "C4", "PIE", "RET", "SIM", "S",
+    "F",  # pyflakes
+    "N",  # pep8-nameing
+    "PL", # pylint
+    "E",  # error
+    "W",  # warning
+    "PTH", # pathlib
+    "RUF", # ruff
+]
+
+[tool.isort]
+profile = "black"
+src_paths = ["cally", "tests"]
