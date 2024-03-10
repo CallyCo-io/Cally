@@ -1,9 +1,22 @@
 from pathlib import Path
+from types import ModuleType
+from typing import List
 
 import click
 
 from . import commands as builtin_commands
 from ._version import VERSION
+
+
+def get_commands(class_obj: ModuleType) -> List:
+    """
+    Convenience method for collecting all available commands
+    """
+    return [
+        val
+        for (key, val) in vars(class_obj).items()
+        if isinstance(val, click.core.Command)
+    ]
 
 
 @click.group()
@@ -29,3 +42,7 @@ def cally(
     """
     Top level click command group for Cally
     """
+
+
+for command in get_commands(builtin_commands):
+    cally.add_command(command)
