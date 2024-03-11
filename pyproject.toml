@@ -48,6 +48,9 @@ cally = "cally.cli:cally"
 [tool.black]
 skip-string-normalization = true
 
+[tool.coverage.run]
+omit = ["tests/*"]
+
 [tool.isort]
 profile = "black"
 src_paths = ["src", "tests"]
