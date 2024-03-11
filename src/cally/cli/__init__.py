@@ -1,22 +1,31 @@
+import pkgutil
+from importlib import import_module
 from pathlib import Path
-from types import ModuleType
 from typing import List
 
 import click
+from click import Group
 
 from . import commands as builtin_commands
-from ._version import VERSION
+from ._version import VERSION as __version__  # noqa: N811
 
 
-def get_commands(class_obj: ModuleType) -> List:
+# TODO: Investigate the lazy loader as this might become quite slow
+# https://click.palletsprojects.com/en/8.1.x/complex/#defining-the-lazy-group
+def get_commands() -> List:
     """
     Convenience method for collecting all available commands
     """
-    return [
-        val
-        for (key, val) in vars(class_obj).items()
-        if isinstance(val, click.core.Command)
-    ]
+    groups = {}
+    for _, name, _is_pkg in pkgutil.walk_packages(builtin_commands.__path__):
+        full_name = f'{builtin_commands.__name__}.{name}'
+        module = import_module(full_name)
+        for sub_module in dir(module):
+            attr = getattr(module, sub_module)
+            if isinstance(attr, Group):
+                groups.update({name: attr})
+
+    return [val for (_, val) in groups.items() if isinstance(val, click.core.Command)]
 
 
 @click.group()
@@ -34,7 +43,7 @@ def get_commands(class_obj: ModuleType) -> List:
     envvar='CALLY_PROJECT_CONFIG',
     help='Path to the project config file',
 )
-@click.version_option(VERSION)
+@click.version_option(__version__)
 @click.pass_context
 def cally(
     ctx: click.Context,  # noqa: ARG001
@@ -46,5 +55,5 @@ def cally(
     """
 
 
-for command in get_commands(builtin_commands):
+for command in get_commands():
     cally.add_command(command)

@@ -4,7 +4,7 @@ from tempfile import TemporaryDirectory
 from types import TracebackType
 from typing import Type
 
-from ..cdktf import stacks
+from cally.cdktf import stacks
 
 
 class Action:

@@ -1,4 +1,4 @@
-from cally.tools.provider import ProviderBuilder
+from cally.cli.tools.provider import ProviderBuilder
 
 from .. import CallyTestHarness
 

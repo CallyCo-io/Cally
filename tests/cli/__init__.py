@@ -1,7 +1,5 @@
+from cally.cli import __version__, cally
 from click.testing import CliRunner
-
-from cally import __version__
-from cally.cli import cally
 
 from .. import CallyTestHarness
 
