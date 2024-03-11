@@ -8,10 +8,15 @@
 		"python.defaultInterpreterPath": "${workspaceFolder:cally}/venv/bin/python",
 		"files.exclude": {
 			"**/__pycache__": true,
+			"**/.pytest_cache": true,
+			"**/.mypy_cache": true,
+			"**/.ruff_cache": true,
+			"**/*egg*": true,
 		},
 		"files.watcherExclude": {
 			"**/.pytest_cache": true,
 			"**/.mypy_cache": true,
+			"**/.ruff_cache": true,
 			"**/*egg*": true,
 			"**/venv": true
 		},
