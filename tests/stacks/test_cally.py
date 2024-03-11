@@ -1,4 +1,4 @@
-from cally.cdk import CallyStack
+from cally.cdk.stacks import CallyStack
 
 from .. import CallyTfTestHarness
 
