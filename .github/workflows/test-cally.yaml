@@ -20,7 +20,5 @@ jobs:
           cache: pip
       - name: Install Cally test dependencies
         run: pip install .[test]
-      - name: Run Ruff # pytest-ruff not picking up pyproject config
-        run: ruff check .
       - name: Run Pytest
         run: pytest -v
