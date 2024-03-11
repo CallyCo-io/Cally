@@ -50,9 +50,11 @@ skip-string-normalization = true
 
 [tool.isort]
 profile = "black"
-src_paths = ["cally", "tests"]
+src_paths = ["src", "tests"]
 
 [tool.pytest.ini_options]
+pythonpath = "src"
+testpaths = "tests"
 addopts = "-p no:cacheprovider --black --mypy --ruff"
 filterwarnings = [
     "ignore",
@@ -60,8 +62,11 @@ filterwarnings = [
     "default:::tests.*"
 ]
 
+[tool.setuptools.packages.find]
+where = ["src"]
+
 [tool.setuptools.dynamic]
-version = {attr = "cally.__version__"}
+version = {attr = "cally.cli._version.VERSION"}
 
 [tool.ruff]
 preview = true
@@ -79,7 +84,7 @@ select = [
     "RUF", # ruff
 ]
 [tool.ruff.lint.per-file-ignores]
-"cally/tools/provider.py" = [
+"src/cally/cli/tools/provider.py" = [
     "S404",  # `subprocess` module is possibly insecure - used for 'cdktf get'
     "S602"  # `subprocess` call with `shell=True` identified - required for 'cdktf get'
 ]
