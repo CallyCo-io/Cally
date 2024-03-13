@@ -4,7 +4,7 @@ from pathlib import Path
 from tempfile import TemporaryDirectory
 from unittest import TestCase, mock
 
-from cally.cdktf import CallyStack
+from cally.cdk import CallyStack
 
 
 class CallyTestHarness(TestCase):
