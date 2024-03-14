@@ -22,7 +22,7 @@ jobs:
           run-id: ${{ github.event.workflow_run.id }}
           github-token: ${{ secrets.GITHUB_TOKEN }}
       - name: Get Cover
-        uses: orgoro/coverage@v3
+        uses: techman83/coverage@demo/workflow_run
         with:
             coverageFile: coverage.xml
             token: ${{ secrets.GITHUB_TOKEN }}
