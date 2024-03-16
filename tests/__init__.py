@@ -7,6 +7,9 @@ from unittest import TestCase, mock
 from cally.cdk import CallyStack
 
 
+from .constants import HOME_ENVS
+
+
 class CallyTestHarness(TestCase):
     working: TemporaryDirectory
 
@@ -16,7 +19,7 @@ class CallyTestHarness(TestCase):
         self.env_patcher = mock.patch.dict(
             os.environ,
             {
-                "HOME": self.working.name,
+                HOME_ENVS.get(os.name, 'UNKNOWN'): self.working.name,
                 "LC_ALL": os.environ.get('LC_ALL', 'C.UTF-8'),
                 "LANG": os.environ.get('LANG', 'C.UTF-8'),
             },
@@ -27,8 +30,8 @@ class CallyTestHarness(TestCase):
 
     def tearDown(self):
         self.env_patcher.stop()
-        self.working.cleanup()
         os.chdir(self.current_working)
+        self.working.cleanup()
 
     @staticmethod
     def get_test_file(filename) -> Path:
