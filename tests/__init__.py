@@ -27,8 +27,8 @@ class CallyTestHarness(TestCase):
 
     def tearDown(self):
         self.env_patcher.stop()
-        self.working.cleanup()
         os.chdir(self.current_working)
+        self.working.cleanup()
 
     @staticmethod
     def get_test_file(filename) -> Path:
