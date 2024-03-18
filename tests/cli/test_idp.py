@@ -4,9 +4,9 @@ from pathlib import Path
 
 sys.path.append(Path(Path(__file__).parent, '../testdata/test_cls').as_posix())
 
-from click.testing import CliRunner
-
 from cally import cli
+from cally.cli.config import CallyConfig
+from click.testing import CliRunner
 
 from .. import CallyTestHarness
 
@@ -17,6 +17,10 @@ class CliTests(CallyTestHarness):
         reload(cli)
 
     def test_example(self):
-        result = CliRunner().invoke(cli.cally, ['example', 'hello', 'World'])
+        result = CliRunner().invoke(
+            cli.cally,
+            ['example', 'hello', 'World'],
+            obj=CallyConfig(config_file='blah.yaml'),
+        )
         self.assertEqual(result.exit_code, 0)
         self.assertEqual(result.output, 'Hello World\n')

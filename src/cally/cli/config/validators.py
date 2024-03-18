@@ -21,6 +21,11 @@ BASE_CALLY_CONFIG = [
         is_type_of=str,
         messages=OPERATIONS_MESSAGE,
     ),
+    Validator(
+        'STACK_TYPE',
+        is_type_of=str,
+        messages=OPERATIONS_MESSAGE,
+    ),
     Validator('PROVIDERS', is_type_of=dict, messages=OPERATIONS_MESSAGE),
     Validator(
         'STACK_VARS',

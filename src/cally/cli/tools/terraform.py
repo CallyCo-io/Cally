@@ -12,11 +12,9 @@ from ..config.types import CallyStackService
 class Action:
     _cwd: Path
     _tmp_dir: TemporaryDirectory
-    stack_type: str
     service: CallyStackService
 
-    def __init__(self, stack_type: str, service: CallyStackService) -> None:
-        self.stack_type = stack_type
+    def __init__(self, service: CallyStackService) -> None:
         self.service = service
 
     def __enter__(self) -> 'Action':
@@ -49,7 +47,7 @@ class Action:
         self,
     ) -> None:
         # TODO: fix typing here
-        cls = getattr(stacks, self.stack_type)
+        cls = getattr(stacks, self.service.stack_type)
         cls(self.service).synth_stack(self.tmp_dir)
 
     def print(self) -> str:

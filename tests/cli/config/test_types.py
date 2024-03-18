@@ -14,23 +14,38 @@ class TestCallyService(CallyTestHarness):
 
 
 class TestCallyStackService(CallyTestHarness):
+    def test_stack_type(self):
+        service = CallyStackService(
+            name='snoopy', environment='yard', stack_type='CallyStack'
+        )
+        self.assertEqual(service.stack_type, 'CallyStack')
+
     def test_provider_empty(self):
-        service = CallyStackService(name='snoopy', environment='yard')
+        service = CallyStackService(
+            name='snoopy', environment='yard', stack_type='CallyStack'
+        )
         self.assertDictEqual(service.get_provider_vars('test'), {})
 
     def test_get_provider_vars(self):
         providers = {'test': {'foo': 'bar', 'bar': 'foo'}, 'another': {'bar': 'foo'}}
         service = CallyStackService(
-            name='snoopy', environment='yard', providers=providers
+            name='snoopy',
+            environment='yard',
+            stack_type='CallyStack',
+            providers=providers,
         )
         self.assertDictEqual(
             service.get_provider_vars('test'), {'foo': 'bar', 'bar': 'foo'}
         )
 
     def test_stack_var_empty(self):
-        service = CallyStackService(name='snoopy', environment='yard')
+        service = CallyStackService(
+            name='snoopy', environment='yard', stack_type='CallyStack'
+        )
         self.assertIsNone(service.get_stack_var('test'))
 
     def test_stack_var_default(self):
-        service = CallyStackService(name='snoopy', environment='yard')
+        service = CallyStackService(
+            name='snoopy', environment='yard', stack_type='CallyStack'
+        )
         self.assertEqual(service.get_stack_var('test', 'charlie'), 'charlie')

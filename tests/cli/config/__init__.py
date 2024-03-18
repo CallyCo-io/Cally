@@ -161,6 +161,7 @@ class CallyConfigTypeTests(CallyTestHarness):
         config = CallyConfig(config_file='blah.yml')
         config.environment = 'test'
         config.service = 'test'
+        config.settings.stack_type = 'CallyStack'
         self.assertIsInstance(
             config.as_dataclass('CallyStackService'), cally_types.CallyStackService
         )
