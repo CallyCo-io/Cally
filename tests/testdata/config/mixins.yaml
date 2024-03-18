@@ -1,0 +1,29 @@
+mixins:
+  mixer:
+    stack_vars:
+      foo: kylie
+  base:
+    stack_vars:
+      rattus: p rattus
+
+harness:
+  mixins:
+    mixer:
+      stack_vars:
+        foo: keith
+
+  services:
+    mixy-m-toasus-service:
+      mixins:
+        - mixer
+      stack_vars:
+        foo: mixy
+    mixy-m-toasus-env:
+      mixins:
+        - mixer
+    mixy-m-toasus-combine:
+      mixins:
+        - mixer
+        - combine
+      stack_vars:
+        rattus: p rattus

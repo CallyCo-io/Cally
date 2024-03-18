@@ -62,3 +62,36 @@ class CallyConfigTests(CallyTestHarness):
             'PROVIDERS': {'test': {'foo': 'totally-not-bar'}},
         }
         self.assertDictEqual(config.settings.to_dict(), data)
+
+    def test_mixin_service_win(self):
+        config = CallyConfig(self.get_test_file('config/mixins.yaml'))
+        config.environment = 'harness'
+        config.service = 'mixy-m-toasus-service'
+        data = {
+            'ENVIRONMENT': 'harness',
+            'NAME': 'mixy-m-toasus-service',
+            'STACK_VARS': {'foo': 'mixy'},
+        }
+        self.assertDictEqual(config.settings.to_dict(), data)
+
+    def test_mixin_env_win(self):
+        config = CallyConfig(self.get_test_file('config/mixins.yaml'))
+        config.environment = 'harness'
+        config.service = 'mixy-m-toasus-env'
+        data = {
+            'ENVIRONMENT': 'harness',
+            'NAME': 'mixy-m-toasus-env',
+            'STACK_VARS': {'foo': 'keith'},
+        }
+        self.assertDictEqual(config.settings.to_dict(), data)
+
+    def test_mixin_combined(self):
+        config = CallyConfig(self.get_test_file('config/mixins.yaml'))
+        config.environment = 'harness'
+        config.service = 'mixy-m-toasus-combine'
+        data = {
+            'ENVIRONMENT': 'harness',
+            'NAME': 'mixy-m-toasus-combine',
+            'STACK_VARS': {'rattus': 'p rattus', 'foo': 'keith'},
+        }
+        self.assertDictEqual(config.settings.to_dict(), data)
