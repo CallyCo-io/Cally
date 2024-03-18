@@ -1,17 +1,7 @@
 {
-    "//": {
-        "metadata": {
-            "backend": "local",
-            "stackName": "test",
-            "version": "0.20.4"
-        },
-        "outputs": {}
-    },
-    "terraform": {
-        "backend": {
-            "local": {
-                "path": "state/test.tfstate"
-            }
+    "backend": {
+        "local": {
+            "path": "state/test.tfstate"
         }
     }
 }

@@ -3,7 +3,7 @@ from pathlib import Path
 from typing import Optional, Union
 
 import click
-from dynaconf import Dynaconf  # type: ignore
+from dynaconf import Dynaconf
 
 from . import types as cally_types
 from .validators import BASE_CALLY_CONFIG

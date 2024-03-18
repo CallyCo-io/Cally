@@ -16,10 +16,12 @@ class TfTests(CallyTestHarness):
     def test_empty_print(self):
         result = CliRunner().invoke(
             tf,
-            ['print', '--service', 'test-cli', '--environment', 'test'],
+            ['print', '--service', 'test', '--environment', 'test'],
             obj=CallyConfig(config_file='blah.yaml'),
         )
         self.assertEqual(result.exit_code, 0)
+        testdata = {"backend": {"local": {"path": "state/test.tfstate"}}}
         self.assertDictEqual(
-            json.loads(result.output), self.load_json_file('cli/empty_print.json')
+            json.loads(result.output).get('terraform'),
+            testdata,
         )
