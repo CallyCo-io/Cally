@@ -4,6 +4,7 @@ from unittest import mock
 from dynaconf import ValidationError  # type: ignore
 
 from cally.cli.config import CallyConfig
+from cally.cli.config import types as cally_types
 
 from ... import CallyTestHarness
 
@@ -146,4 +147,20 @@ class CallyConfigValidationTests(CallyTestHarness):
         self.assertEqual(
             "PROVIDERS must is_type_of <class 'dict'>, but is: first,second,third",
             str(context.exception),
+        )
+
+
+class CallyConfigTypeTests(CallyTestHarness):
+    def test_as_cally_service(self):
+        config = CallyConfig(config_file='blah.yml')
+        config.environment = 'test'
+        config.service = 'test'
+        self.assertIsInstance(config.as_dataclass(), cally_types.CallyService)
+
+    def test_as_cally_stack_service(self):
+        config = CallyConfig(config_file='blah.yml')
+        config.environment = 'test'
+        config.service = 'test'
+        self.assertIsInstance(
+            config.as_dataclass('CallyStackService'), cally_types.CallyStackService
         )
