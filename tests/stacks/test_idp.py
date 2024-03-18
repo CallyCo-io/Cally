@@ -18,6 +18,6 @@ class IdpStackTests(CallyTfTestHarness):
         self.assertEqual(stacks.MinimalStack.__name__, 'MinimalStack')
 
     def test_empty_synth(self):
-        stack = stacks.MinimalStack('test')
+        stack = stacks.MinimalStack(service=self.empty_service)
         result = self.synth_stack(stack)
-        self.assertDictEqual(result, self.load_json_file('cdktf/empty_synth.json'))
+        self.assertDictEqual(result, self.load_json_file('cdk/empty_synth.json'))
