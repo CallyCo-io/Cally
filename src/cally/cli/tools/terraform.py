@@ -6,16 +6,18 @@ from typing import Type
 
 from cally.cdk import stacks
 
+from ..config.types import CallyStackService
+
 
 class Action:
     _cwd: Path
     _tmp_dir: TemporaryDirectory
-    stack_name: str
     stack_type: str
+    service: CallyStackService
 
-    def __init__(self, stack_name: str, stack_type: str) -> None:
-        self.stack_name = stack_name
+    def __init__(self, stack_type: str, service: CallyStackService) -> None:
         self.stack_type = stack_type
+        self.service = service
 
     def __enter__(self) -> 'Action':
         self._tmp_dir = TemporaryDirectory()
@@ -37,7 +39,7 @@ class Action:
 
     @property
     def output_path(self) -> Path:
-        return Path(self.tmp_dir, 'stacks', self.stack_name)
+        return Path(self.tmp_dir, 'stacks', self.service.name)
 
     @property
     def output_file(self) -> Path:
@@ -48,7 +50,7 @@ class Action:
     ) -> None:
         # TODO: fix typing here
         cls = getattr(stacks, self.stack_type)
-        cls(self.stack_name).synth_stack(self.tmp_dir)
+        cls(self.service).synth_stack(self.tmp_dir)
 
     def print(self) -> str:
         self.synth_stack()

@@ -1,7 +1,9 @@
 import json
 
-from cally.cli.commands.tf import tf
 from click.testing import CliRunner
+
+from cally.cli.commands.tf import tf
+
 from .. import CallyTestHarness
 
 
