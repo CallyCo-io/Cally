@@ -8,6 +8,7 @@ import click
 from click import Group
 
 from ._version import VERSION as __version__  # noqa: N811
+from .config import CallyConfig
 
 
 # TODO: Investigate the lazy loader as this might become quite slow
@@ -31,29 +32,22 @@ def get_commands(package_name: str) -> List:
 
 @click.group()
 @click.option(
-    '--core-config',
+    '--config',
     type=click.Path(path_type=Path),
-    default=Path(Path.home(), '.config', 'cally.yaml'),
-    envvar='CALLY_CORE_CONFIG',
-    help='Path to the core config file',
-)
-@click.option(
-    '--project-config',
-    type=click.Path(path_type=Path),
-    default=Path(Path.cwd(), '.cally.yaml'),
-    envvar='CALLY_PROJECT_CONFIG',
+    default=Path(Path.cwd(), 'cally.yaml'),
+    envvar='CALLY_CONFIG',
     help='Path to the project config file',
 )
 @click.version_option(__version__)
 @click.pass_context
 def cally(
     ctx: click.Context,  # noqa: ARG001
-    core_config: click.Path,  # noqa: ARG001
-    project_config: click.Path,  # noqa: ARG001
+    config: Path,  # noqa: ARG001
 ) -> None:
     """
     Top level click command group for Cally
     """
+    ctx.obj = CallyConfig(config_file=config)
 
 
 commands = get_commands('cally.cli.commands')

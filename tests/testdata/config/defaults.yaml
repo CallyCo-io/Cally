@@ -1,0 +1,16 @@
+defaults:
+  providers:
+    test:
+      foo: bar
+
+harness:
+  defaults:
+    providers:
+      test:
+        foo: not-bar
+
+  services:
+    defaults:
+      providers:
+        test:
+          foo: really-not-bar

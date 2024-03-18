@@ -2,9 +2,7 @@ import inspect
 from copy import deepcopy
 from dataclasses import dataclass, make_dataclass
 from importlib import import_module
-from typing import Any, List
-
-from constructs import Construct
+from typing import TYPE_CHECKING, Any, List
 
 from cdktf import (
     App,
@@ -13,6 +11,10 @@ from cdktf import (
     TerraformResource,
     TerraformStack,
 )
+from constructs import Construct
+
+if TYPE_CHECKING:
+    from cally.cli.config.types import CallyStackService
 
 
 @dataclass
@@ -68,16 +70,24 @@ class CallyResource:
 
 class CallyStack:
     _resources: List[CallyResource]
-    name: str
+    service: 'CallyStackService'
 
-    def __init__(self, name: str) -> None:
-        self.name = name
+    def __init__(self, service: 'CallyStackService') -> None:
+        self.service = service
 
     def add_resource(self, resource: CallyResource) -> None:
         self.resources.append(resource)
 
     def add_resources(self, resources: List[CallyResource]) -> None:
         self.resources.extend(resources)
+
+    @property
+    def name(self) -> str:
+        return self.service.name
+
+    @property
+    def environment(self) -> str:
+        return self.service.environment
 
     @property
     def resources(self) -> List[CallyResource]:

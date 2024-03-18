@@ -13,6 +13,8 @@ jobs:
         python: ["3.11"]
     steps:
       - uses: actions/checkout@v4
+
+      # Cally Testing
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
@@ -20,5 +22,28 @@ jobs:
           cache: pip
       - name: Install Cally test dependencies
         run: pip install .[test]
+
+      # Provider Packages
+      - name: Restore Provider Packages
+        id: cache-providers
+        uses: actions/cache@v4
+        with:
+          path: build/random/dist/CallyProvidersRandom-3.6.0.tar.gz
+          key: cally-provider-random-3.6.0
+      - uses: actions/setup-node@v4
+        if: steps.cache-providers.outputs.cache-hit != 'true'
+        with:
+          node-version: "20"
+      - name: Install cdktf-cli and build
+        if: steps.cache-providers.outputs.cache-hit != 'true'
+        run: |
+          npm install cdktf-cli
+          echo "$(pwd)/node_modules/.bin/" >> $GITHUB_PATH
+          cally provider build --provider random --version 3.6.0
+          (cd build/random && python -m build)
+      - name: Install Provider Pacakge
+        run: pip install build/random/dist/CallyProvidersRandom-3.6.0.tar.gz
+
+      # Run Tests
       - name: Run Pytest
         run: pytest -v

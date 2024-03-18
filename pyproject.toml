@@ -8,6 +8,8 @@ dynamic = ["version"]
 dependencies = [
   "cdktf",
   "click",
+  "dynaconf",
+  "PyYAML",
 ]
 requires-python = ">=3.8"
 authors = [
@@ -20,6 +22,7 @@ license = {file = "LICENSE.md"}
 [project.optional-dependencies]
 development = [
   "black",
+  "build",
   "coverage",
   "isort",
   "mypy",
@@ -32,6 +35,7 @@ development = [
 ]
 test = [
   "black",
+  "build",
   "coverage",
   "mypy",
   "pytest",

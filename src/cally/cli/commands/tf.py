@@ -1,5 +1,6 @@
 import click
 
+from ..config.types import CallyStackService
 from ..tools import terraform
 
 
@@ -9,10 +10,12 @@ def tf() -> None:
 
 
 @click.command(name='print')
+# TODO: Load this by default from config
 @click.option('--stack-name')
 @click.option('--stack-type')
 def print_template(stack_name: str, stack_type: str):
-    with terraform.Action(stack_name=stack_name, stack_type=stack_type) as action:
+    service = CallyStackService(name=stack_name, environment='test')
+    with terraform.Action(stack_type=stack_type, service=service) as action:
         click.secho(action.print())
 
 
