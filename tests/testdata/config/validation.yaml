@@ -1,0 +1,7 @@
+harness:
+  services:
+    INVALID-name:
+    invalid-stack-vars:
+      stack_vars: first,second,third
+    invalid-providers:
+      providers: first,second,third

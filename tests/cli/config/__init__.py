@@ -1,6 +1,8 @@
 import os
 from unittest import mock
 
+from dynaconf import ValidationError  # type: ignore
+
 from cally.cli.config import CallyConfig
 
 from ... import CallyTestHarness
@@ -102,3 +104,46 @@ class CallyConfigTests(CallyTestHarness):
             'STACK_VARS': {'rattus': 'p rattus', 'foo': 'keith'},
         }
         self.assertDictEqual(config.settings.to_dict(), data)
+
+
+class CallyConfigValidationTests(CallyTestHarness):
+    def test_name_upper_raises(self):
+        config = CallyConfig(self.get_test_file('config/validation.yaml'))
+        config.environment = 'harness'
+        config.service = 'INVALID-name'
+        with self.assertRaises(ValidationError) as context:
+            _ = config.settings.name
+        self.assertEqual('Name must be lowercase', str(context.exception))
+
+    def test_environment_raises(self):
+        config = CallyConfig(config_file='blah.yaml')
+        config.environment = 10
+        config.service = 'name'
+        with self.assertRaises(ValidationError) as context:
+            _ = config.settings.name
+        self.assertEqual(
+            "ENVIRONMENT must is_type_of <class 'str'>, but is: 10",
+            str(context.exception),
+        )
+
+    def test_stack_vars_not_dict_raises(self):
+        config = CallyConfig(self.get_test_file('config/validation.yaml'))
+        config.environment = 'harness'
+        config.service = 'invalid-stack-vars'
+        with self.assertRaises(ValidationError) as context:
+            _ = config.settings.name
+        self.assertEqual(
+            "STACK_VARS must is_type_of <class 'dict'>, but is: first,second,third",
+            str(context.exception),
+        )
+
+    def test_providers_not_dict_raises(self):
+        config = CallyConfig(self.get_test_file('config/validation.yaml'))
+        config.environment = 'harness'
+        config.service = 'invalid-providers'
+        with self.assertRaises(ValidationError) as context:
+            _ = config.settings.name
+        self.assertEqual(
+            "PROVIDERS must is_type_of <class 'dict'>, but is: first,second,third",
+            str(context.exception),
+        )

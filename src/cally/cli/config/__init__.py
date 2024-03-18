@@ -5,6 +5,9 @@ import click
 from dynaconf import Dynaconf  # type: ignore
 
 
+from .validators import BASE_CALLY_CONFIG
+
+
 class CallyConfig:
     config_file: Path
     _environment: Optional[str] = None
@@ -43,6 +46,7 @@ class CallyConfig:
                 loaders=[
                     'cally.cli.config.loader',
                 ],
+                validators=BASE_CALLY_CONFIG,
                 cally_env=self.environment,
                 cally_service=self.service,
             )
