@@ -8,6 +8,8 @@ dynamic = ["version"]
 dependencies = [
   "cdktf",
   "click",
+  "dynaconf",
+  "PyYAML",
 ]
 requires-python = ">=3.8"
 authors = [
