@@ -2,7 +2,7 @@ import inspect
 from copy import deepcopy
 from dataclasses import dataclass, make_dataclass
 from importlib import import_module
-from typing import TYPE_CHECKING, Any, List
+from typing import TYPE_CHECKING, Any, Dict, List, Optional
 
 from cdktf import (
     App,
@@ -39,9 +39,12 @@ class CallyResource:
     def __str__(self) -> str:
         return f'${{{self.resource}.{self.attributes.id}.id}}'
 
-    def __getattr__(self, item: str) -> str:
+    def __getattr__(self, item: str) -> Optional[str]:
+        # TODO: This likely could use some improvement
         if item.startswith('__jsii'):
             return getattr(self._instantiated_resource, item)
+        if item == 'attributes':
+            return None
         return f'${{{self.resource}.{self.attributes.id}.{item}}}'
 
     def _get_attribute_default(self, name: str) -> Any:
@@ -59,7 +62,11 @@ class CallyResource:
         ]
         name = f'{self.__class__.__name__}CallyAttributes'
         cls = make_dataclass(name, fields, bases=(CallyResourceAttributes,))
-        return cls(**{'id_': identifier, **kwargs})
+        # Some newer provider releases appear to use 'id_'
+        id_field = 'id'
+        if 'id_' in parameters:
+            id_field = 'id_'
+        return cls(**{id_field: identifier, **kwargs})
 
     def construct_resource(self, scope: Construct, provider: TerraformProvider) -> None:
         self.attributes.provider = provider
@@ -69,6 +76,7 @@ class CallyResource:
 
 
 class CallyStack:
+    _providers: Dict[str, TerraformProvider]
     _resources: List[CallyResource]
     service: 'CallyStackService'
 
@@ -80,6 +88,24 @@ class CallyStack:
 
     def add_resources(self, resources: List[CallyResource]) -> None:
         self.resources.extend(resources)
+
+    def get_provider(self, scope: Construct, provider: str) -> TerraformProvider:
+        if provider not in self.providers:
+            # google_beta -> GoogleBetaProvider
+            resource = f"{provider.capitalize().replace('_', '')}Provider"
+            module = import_module(f'cally.providers.{provider}.provider')
+            cls = getattr(module, resource)
+            self.providers.update(
+                {
+                    provider: cls(
+                        scope, id=provider, **self.service.providers.get(provider, {})
+                    )
+                }
+            )
+        prov = self.providers.get(provider)
+        if prov is None:
+            raise ValueError("Provider instantion failed")
+        return prov
 
     @property
     def name(self) -> str:
@@ -95,6 +121,12 @@ class CallyStack:
             self._resources = []
         return self._resources
 
+    @property
+    def providers(self) -> Dict[str, TerraformProvider]:
+        if getattr(self, '_providers', None) is None:
+            self._providers = {}
+        return self._providers
+
     def synth_stack(self, outdir='cdktf.out'):
         stack = self
 
@@ -104,8 +136,10 @@ class CallyStack:
                 super().__init__(scope, stack.name)
                 # TODO: Build provider loader
                 for resource in stack.resources:
-                    provider = TerraformProvider(self, 'test')  # type: ignore
-                    resource.construct_resource(self, provider=provider)
+                    resource.construct_resource(
+                        self,
+                        provider=stack.get_provider(self, resource.provider),
+                    )
 
                 LocalBackend(
                     self, path=f'state/{stack.name}.tfstate'
