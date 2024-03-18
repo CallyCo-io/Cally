@@ -55,6 +55,14 @@ skip-string-normalization = true
 [tool.coverage.run]
 omit = ["tests/*"]
 
+[[tool.mypy.overrides]]
+module = "dynaconf.*"
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = "cally.providers.*"
+ignore_missing_imports = true
+
 [tool.isort]
 profile = "black"
 src_paths = ["src", "tests"]

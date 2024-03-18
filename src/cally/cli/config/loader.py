@@ -1,7 +1,7 @@
 from pathlib import Path
 
 import yaml
-from dynaconf import LazySettings  # type: ignore
+from dynaconf import LazySettings
 
 
 def load(obj: LazySettings, *args, **kwargs) -> None:  # noqa: ARG001
