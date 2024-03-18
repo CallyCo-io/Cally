@@ -1,8 +1,12 @@
+from dataclasses import fields
 from pathlib import Path
 from typing import Optional, Union
 
 import click
 from dynaconf import Dynaconf  # type: ignore
+
+from . import types as cally_types
+from .validators import BASE_CALLY_CONFIG
 
 
 class CallyConfig:
@@ -43,10 +47,20 @@ class CallyConfig:
                 loaders=[
                     'cally.cli.config.loader',
                 ],
+                validators=BASE_CALLY_CONFIG,
                 cally_env=self.environment,
                 cally_service=self.service,
             )
         return self._settings
+
+    def as_dataclass(self, cally_type='CallyService') -> cally_types.CallyService:
+        cls = getattr(cally_types, cally_type)
+        items = {
+            x.name: getattr(self.settings, x.name)
+            for x in fields(cally_types.CallyStackService)
+            if x.name in self.settings
+        }
+        return cls(**items)
 
 
 def ctx_callback(

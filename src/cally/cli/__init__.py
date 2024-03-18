@@ -40,10 +40,7 @@ def get_commands(package_name: str) -> List:
 )
 @click.version_option(__version__)
 @click.pass_context
-def cally(
-    ctx: click.Context,  # noqa: ARG001
-    config: Path,  # noqa: ARG001
-) -> None:
+def cally(ctx: click.Context, config: Path) -> None:
     """
     Top level click command group for Cally
     """

@@ -7,7 +7,6 @@ from unittest import TestCase, mock
 from cally.cdk import CallyStack
 from cally.cli.config.types import CallyStackService
 
-
 from .constants import HOME_ENVS
 
 
@@ -49,7 +48,9 @@ class CallyTfTestHarness(CallyTestHarness):
 
     def setUp(self):
         super().setUp()
-        self.empty_service = CallyStackService(name='test', environment='cally')
+        self.empty_service = CallyStackService(
+            name='test', environment='cally', stack_type='CallyStack'
+        )
 
     def synth_stack(self, stack: CallyStack) -> dict:
         stack.synth_stack(self.working.name)

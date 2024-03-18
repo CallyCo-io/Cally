@@ -10,6 +10,7 @@ class CallyService:
 
 @dataclass
 class CallyStackService(CallyService):
+    stack_type: str
     providers: dict = field(default_factory=dict)
     stack_vars: dict = field(default_factory=dict)
 
