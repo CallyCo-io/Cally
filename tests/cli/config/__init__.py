@@ -12,6 +12,13 @@ class CallyConfigTests(CallyTestHarness):
         config.service = 'test'
         self.assertEqual(config.settings.name, 'test')
 
+    def test_empty_service(self):
+        config = CallyConfig(config_file='blah.yml')
+        config.environment = 'empty'
+        config.service = 'empty'
+        data = {'ENVIRONMENT': 'empty', 'NAME': 'empty'}
+        self.assertDictEqual(config.settings.to_dict(), data)
+
     def test_environment(self):
         config = CallyConfig(config_file='blah.yml')
         config.environment = 'test'

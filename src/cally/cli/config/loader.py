@@ -40,18 +40,18 @@ def load(obj: LazySettings, *args, **kwargs) -> None:  # noqa: ARG001
     if obj.cally_service is not None:
         obj.update(name=obj.cally_service)
     if all([obj.cally_env, obj.cally_service]):
-        service: dict = (
+        service = (
             loaded.get(obj.cally_env, {}).get('services', {}).get(obj.cally_service, {})
         )
+        if service is None:
+            service = {}
         mixins = service.pop('mixins', [])
         # Resolution Order: Global Mixins, Env Mixins, Service
         # The last to be loaded wins.
         for mixin in [x.strip() for x in mixins if len(x.strip()) > 0]:
             obj.update(loaded.get('mixins', {}).get(mixin, {}))
             obj.update(loaded.get(obj.cally_env, {}).get('mixins', {}).get(mixin, {}))
-        obj.update(
-            loaded.get(obj.cally_env, {}).get('services', {}).get(obj.cally_service, {})
-        )
+        obj.update(service)
 
     # Environment Variables
     prefix: str = obj.envvar_prefix_for_dynaconf
