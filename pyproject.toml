@@ -53,7 +53,14 @@ cally = "cally.cli:cally"
 skip-string-normalization = true
 
 [tool.coverage.run]
+branch = true
 omit = ["tests/*"]
+
+[tool.coverage.report]
+exclude_lines = [
+    "if TYPE_CHECKING:",
+    "    pass",
+]
 
 [[tool.mypy.overrides]]
 module = "dynaconf.*"
