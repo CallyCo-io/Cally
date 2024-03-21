@@ -2,6 +2,9 @@ name: Build / Cache Providers
 
 on:
   workflow_call:
+  push:
+    branches:
+      - main
 
 concurrency:
   group: provider-builds
@@ -23,7 +26,7 @@ jobs:
         id: cache-providers
         uses: actions/cache@v4
         with:
-          path: build/random/dist/${ matrix.name }}-${{ matrix.version }}.tar.gz
+          path: build/${{ matrix.provider }}/dist/${{ matrix.name }}-${{ matrix.version }}.tar.gz
           key: cally-provider-${{ matrix.provider }}-${{ matrix.version }}
       - uses: actions/checkout@v4
         if: steps.cache-providers.outputs.cache-hit != 'true'
