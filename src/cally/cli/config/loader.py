@@ -3,6 +3,11 @@ from pathlib import Path
 import yaml
 from dynaconf import LazySettings
 
+try:
+    from cally.idp.defaults import DEFAULTS as IDP_DEFAULTS  # type: ignore
+except ModuleNotFoundError:
+    IDP_DEFAULTS: dict = {}  # type: ignore[no-redef]
+
 
 def load(obj: LazySettings, *args, **kwargs) -> None:  # noqa: ARG001
     """
@@ -31,6 +36,7 @@ def load(obj: LazySettings, *args, **kwargs) -> None:  # noqa: ARG001
         loaded = yaml.safe_load(config_file.read_text())
 
     # Defaults
+    obj.update(IDP_DEFAULTS)
     obj.update(loaded.get('defaults', {}))
     if obj.cally_env is not None:
         obj.update(environment=obj.cally_env)

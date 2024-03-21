@@ -1,10 +1,10 @@
 import os
 from unittest import mock
 
-from cally.cli.config import CallyConfig
-from cally.cli.config import types as cally_types
 from dynaconf import ValidationError
 
+from cally.cli.config import CallyConfig
+from cally.cli.config import types as cally_types
 from ... import CallyTestHarness
 
 
