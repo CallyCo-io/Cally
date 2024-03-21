@@ -1,5 +1,7 @@
 import json
 import os
+import sys
+from importlib import import_module, reload
 from pathlib import Path
 from tempfile import TemporaryDirectory
 from unittest import TestCase, mock
@@ -56,3 +58,35 @@ class CallyTfTestHarness(CallyTestHarness):
         stack.synth_stack(self.working.name)
         output_file = Path(self.working.name, 'stacks', stack.name, 'cdk.tf.json')
         return json.loads(output_file.read_text())
+
+
+class CallyIdpTestHarness(CallyTfTestHarness):
+    def setUp(self):
+        sys.path.append(Path(Path(__file__).parent, 'testdata/test_cls').as_posix())
+        self.reload_cally_modules()
+        super().setUp()
+
+    def tearDown(self):
+        super().tearDown()
+        sys.path.remove(Path(Path(__file__).parent, 'testdata/test_cls').as_posix())
+        for mod in [
+            'cally.idp',
+            'cally.idp.defaults',
+            'cally.idp.stacks',
+            'cally.idp.commands',
+        ]:
+            if mod in sys.modules:
+                del sys.modules[mod]
+        self.reload_cally_modules()
+
+    @staticmethod
+    def reload_cally_modules():
+        modules = [
+            'cally.cli',
+            'cally.cdk.stacks',
+            'cally.cli.config.loader',
+            'cally.cli.config',
+        ]
+        for module in modules:
+            mod = import_module(module)
+            reload(mod)

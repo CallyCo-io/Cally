@@ -1,19 +1,9 @@
-import sys
-from importlib import reload
-from pathlib import Path
-
-sys.path.append(Path(Path(__file__).parent, '../testdata/test_cls').as_posix())
-
 from cally.cdk import stacks
 
-from .. import CallyTfTestHarness
+from .. import CallyIdpTestHarness
 
 
-class IdpStackTests(CallyTfTestHarness):
-    def setUp(self):
-        super().setUp()
-        reload(stacks)
-
+class IdpStackTests(CallyIdpTestHarness):
     def test_class_load(self):
         self.assertEqual(stacks.MinimalStack.__name__, 'MinimalStack')
 

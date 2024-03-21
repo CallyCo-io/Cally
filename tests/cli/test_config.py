@@ -10,7 +10,6 @@ from .. import CallyTestHarness
 
 
 class ConfigCliTests(CallyTestHarness):
-
     @mock.patch.dict(os.environ, {"CALLY_STACK_TYPE": "CallyStack"})
     def test_print_service_basic(self):
         result = CliRunner().invoke(
