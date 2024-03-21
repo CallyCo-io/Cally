@@ -1,0 +1,49 @@
+name: Build / Cache Providers
+
+on:
+  workflow_call:
+
+concurrency:
+  group: provider-builds
+
+jobs:
+  build-providers:
+    strategy:
+      matrix:
+        include:
+          - provider: random
+            version: 3.6.0
+            name: CallyProvidersRandom
+          - provider: google
+            version: 5.21.0
+            name: CallyProvidersGoogle
+    runs-on: ubuntu-latest
+    steps:
+      - name: Restore Provider Packages
+        id: cache-providers
+        uses: actions/cache@v4
+        with:
+          path: build/random/dist/${ matrix.name }}-${{ matrix.version }}.tar.gz
+          key: cally-provider-${{ matrix.provider }}-${{ matrix.version }}
+      - uses: actions/checkout@v4
+        if: steps.cache-providers.outputs.cache-hit != 'true'
+      - name: Setup Python
+        if: steps.cache-providers.outputs.cache-hit != 'true'
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+      - name: Install Cally
+        if: steps.cache-providers.outputs.cache-hit != 'true'
+        run: pip install .[provider_build]
+      - uses: actions/setup-node@v4
+        if: steps.cache-providers.outputs.cache-hit != 'true'
+        with:
+          node-version: "20"
+      - name: Install cdktf-cli and build
+        if: steps.cache-providers.outputs.cache-hit != 'true'
+        run: |
+          npm install cdktf-cli
+          echo "$(pwd)/node_modules/.bin/" >> $GITHUB_PATH
+          cally provider build --provider ${{ matrix.provider }} --version ${{ matrix.version }}
+          (cd build/${{ matrix.provider }} && python -m build)

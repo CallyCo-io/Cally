@@ -45,6 +45,9 @@ test = [
   "ruff",
   "types-PyYAML",
 ]
+provider_build = [
+  "build"
+]
 
 [project.scripts]
 cally = "cally.cli:cally"
