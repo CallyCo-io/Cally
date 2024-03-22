@@ -1,0 +1,2 @@
+class CallyTestingTestdataError(Exception):
+    pass
