@@ -44,7 +44,7 @@ jobs:
         if: steps.cache-providers.outputs.cache-hit != 'true'
         run: |
           npm install cdktf-cli
-          echo "$(pwd)/node_modules/.bin/" >> $GITHUB_PATH
+          export PATH=:$(pwd)/node_modules/.bin:$PATH
           cally provider build --provider ${{ matrix.provider }} --version ${{ matrix.version }}
           (cd build/${{ matrix.provider }} && python -m build)
       - name: Install + check package
