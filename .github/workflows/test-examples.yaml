@@ -1,0 +1,49 @@
+name: Test Cally Examples
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build-providers:
+    uses: ./.github/workflows/build-providers.yaml
+  pytest:
+    needs: build-providers
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        project: ["minimal"]
+    steps:
+      # Restore Provider Packages
+      - uses: actions/checkout@v4
+      - uses: actions/cache/restore@v3
+        id: cache
+        with:
+          path: build/random/dist/CallyProvidersRandom-3.6.0.tar.gz
+          key: cally-provider-random-3.6.0
+
+      # Cally Install
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+      - name: Install Provider Pacakge
+        run: pip install build/random/dist/CallyProvidersRandom-3.6.0.tar.gz
+      - name: Install Cally
+        run: pip install .
+
+      # IDP Install
+      - uses: actions/checkout@v4
+        with:
+          repository: CallyCo-io/cally-examples
+          path: examples
+      - name: Install ${{ matrix.project }}
+        working-directory: examples/${{ matrix.project }}
+        run: pip install .[test]
+
+      # Run Tests
+      - name: Run Pytest for ${{ matrix.project }}
+        working-directory: examples/${{ matrix.project }}
+        run: pytest -v
