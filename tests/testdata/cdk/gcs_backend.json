@@ -1,0 +1,8 @@
+{
+    "backend": {
+        "gcs": {
+            "bucket": "BucketyMcBucketFace",
+            "prefix": "water/cally/test"
+        }
+    }
+}

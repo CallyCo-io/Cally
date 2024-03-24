@@ -49,3 +49,41 @@ class TestCallyStackService(CallyTestHarness):
             name='snoopy', environment='yard', stack_type='CallyStack'
         )
         self.assertEqual(service.get_stack_var('test', 'charlie'), 'charlie')
+
+    def test_default_backend(self):
+        service = CallyStackService(
+            name='snoopy', environment='yard', stack_type='CallyStack'
+        )
+        self.assertEqual(service.backend_type, 'LocalBackend')
+
+    def test_default_state_path(self):
+        service = CallyStackService(
+            name='snoopy', environment='yard', stack_type='CallyStack'
+        )
+        self.assertDictEqual(service.backend_config, {'path': 'state/yard/snoopy'})
+
+    def test_supplied_backend(self):
+        service = CallyStackService(
+            name='snoopy',
+            environment='yard',
+            stack_type='CallyStack',
+            backend={'type': 'GcsBackend'},
+        )
+        self.assertEqual(service.backend_type, 'GcsBackend')
+
+    def test_custom_path(self):
+        service = CallyStackService(
+            name='snoopy',
+            environment='yard',
+            stack_type='CallyStack',
+            providers={'google': {'project': 'test-project'}},
+            backend={
+                'path': '{environment}/{providers[google][project]}/{name}',
+                'path_key': 'prefix',
+                'config': {'bucket': 'BucketyMcBucketFace'},
+            },
+        )
+        self.assertDictEqual(
+            service.backend_config,
+            {'bucket': 'BucketyMcBucketFace', 'prefix': 'yard/test-project/snoopy'},
+        )

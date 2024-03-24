@@ -32,4 +32,7 @@ BASE_CALLY_CONFIG = [
         is_type_of=dict,
         messages=OPERATIONS_MESSAGE,
     ),
+    Validator("BACKEND.type", is_type_of=str, messages=OPERATIONS_MESSAGE),
+    Validator("BACKEND.path", is_type_of=str, messages=OPERATIONS_MESSAGE),
+    Validator("BACKEND.key", is_type_of=str, messages=OPERATIONS_MESSAGE),
 ]

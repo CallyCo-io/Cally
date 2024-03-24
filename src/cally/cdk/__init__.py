@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING, Any, Dict, List, Optional
 
 from cdktf import (
     App,
-    LocalBackend,
+    TerraformBackend,
     TerraformProvider,
     TerraformResource,
     TerraformStack,
@@ -89,6 +89,10 @@ class CallyStack:
     def add_resources(self, resources: List[CallyResource]) -> None:
         self.resources.extend(resources)
 
+    def get_backend(self) -> TerraformBackend:
+        mod = import_module('cdktf')
+        return getattr(mod, self.service.backend_type)
+
     def get_provider(self, scope: Construct, provider: str) -> TerraformProvider:
         if provider not in self.providers:
             # google_beta -> GoogleBetaProvider
@@ -134,16 +138,12 @@ class CallyStack:
 
             def __init__(self, scope: Construct) -> None:
                 super().__init__(scope, stack.name)
-                # TODO: Build provider loader
                 for resource in stack.resources:
                     resource.construct_resource(
                         self,
                         provider=stack.get_provider(self, resource.provider),
                     )
-
-                LocalBackend(
-                    self, path=f'state/{stack.name}.tfstate'
-                )  # TODO: load this
+                stack.get_backend()(self, **stack.service.backend_config)
 
         app = App(outdir=outdir)
         MyStack(app)
