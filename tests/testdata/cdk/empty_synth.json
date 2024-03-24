@@ -1,7 +1,7 @@
 {
     "backend": {
         "local": {
-            "path": "state/test.tfstate"
+            "path": "state/cally/test"
         }
     }
 }

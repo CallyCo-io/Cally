@@ -20,7 +20,7 @@ class TfTests(CallyTestHarness):
             obj=CallyConfig(config_file='blah.yaml'),
         )
         self.assertEqual(result.exit_code, 0)
-        testdata = {"backend": {"local": {"path": "state/test.tfstate"}}}
+        testdata = {"backend": {"local": {"path": "state/test/test"}}}
         self.assertDictEqual(
             json.loads(result.output).get('terraform'),
             testdata,
