@@ -1,0 +1,75 @@
+name: Release Cally
+
+on:
+  push:
+    tags:
+      - "v*"
+
+jobs:
+  test-cally:
+    uses: ./.github/workflows/test-cally.yaml
+
+  build-artifact:
+    runs-on: ubuntu-latest
+    needs: test-cally
+    outputs:
+      version: ${{ steps.set-version.outputs.version }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set package version
+        id: set-version
+        run: echo "VERSION=$( echo $GITHUB_REF | sed 's/refs\/tags\/v//' )" >> $GITHUB_OUTPUT
+      - name: Write version
+        env:
+          VERSION: ${{ steps.set-version.outputs.version }}
+        run: |
+          echo "VERSION: $VERSION"
+          echo "VERSION = '$VERSION'" > src/cally/cli/_version.py
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install build
+        run: pip install build
+      - name: Build distribution
+        run: python -m build
+      - name: Save dist files
+        uses: actions/upload-artifact@v3
+        with:
+          name: package-${{ steps.set-version.outputs.version }}
+          path: dist
+          if-no-files-found: "error"
+
+  generate-pypi-release:
+    runs-on: ubuntu-latest
+    needs: build-artifact
+    environment:
+      name: pypi
+      url: https://pypi.org/p/cally
+    permissions:
+      id-token: write
+    steps:
+      - name: Get distribution
+        uses: actions/download-artifact@v3
+        with:
+          name: package-${{ needs.build-artifact.outputs.version }}
+          path: dist
+      - name: Publish
+        uses: pypa/gh-action-pypi-publish@release/v1
+
+  generate-gh-release:
+    runs-on: ubuntu-latest
+    needs: build-artifact
+    steps:
+      - name: Get distribution
+        uses: actions/download-artifact@v3
+        with:
+          name: package-${{ needs.build-artifact.outputs.version }}
+          path: dist
+      - uses: "marvinpinto/action-automatic-releases@latest"
+        with:
+          repo_token: "${{ secrets.GITHUB_TOKEN }}"
+          prerelease: false
+          draft: false
+          files: |
+            dist/cally-${{ needs.build-artifact.outputs.version }}.tar.gz

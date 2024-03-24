@@ -17,7 +17,11 @@ authors = [
 ]
 description = "A config as infrastructure foundation for your Internal Developer Platform"
 readme = "README.md"
-license = {file = "LICENSE.md"}
+license = {file = "LICENSE"}
+
+[project.urls]
+Repository = "https://github.com/CallyCo-io/Cally/"
+Issues = "https://github.com/CallyCo-io/Cally/issues"
 
 [project.optional-dependencies]
 development = [
