@@ -52,6 +52,13 @@ test = [
 provider_build = [
   "build"
 ]
+docs = [
+  "sphinx",
+  "sphinx-issues",
+  "sphinxcontrib-log-cabinet",
+  "sphinx-tabs",
+  "Pallets-Sphinx-Themes",
+]
 
 [project.scripts]
 cally = "cally.cli:cally"
@@ -61,13 +68,17 @@ skip-string-normalization = true
 
 [tool.coverage.run]
 branch = true
-omit = ["tests/*"]
+omit = ["tests/*", "docs/*"]
 
 [tool.coverage.report]
 exclude_lines = [
     "if TYPE_CHECKING:",
     "    pass",
 ]
+
+[[tool.mypy.overrides]]
+module = "pallets_sphinx_themes.*"
+ignore_missing_imports = true
 
 [[tool.mypy.overrides]]
 module = "dynaconf.*"
@@ -99,6 +110,7 @@ version = {attr = "cally.cli._version.VERSION"}
 
 [tool.ruff]
 preview = true
+exclude = ["docs"]
 
 [tool.ruff.lint]
 select = [
