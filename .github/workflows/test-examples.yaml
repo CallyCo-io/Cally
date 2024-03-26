@@ -13,7 +13,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        project: ["minimal"]
+        project: ["minimal", "opinionated"]
     steps:
       # Restore Provider Packages
       - uses: actions/checkout@v4
