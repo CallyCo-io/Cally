@@ -25,6 +25,7 @@ class CallyResourceAttributes:
 
 class CallyResource:
     _cdktf_resource: Any  # This is probably a callable TerraformResource
+    _id_field: str
     _instantiated_resource: TerraformResource
     attributes: CallyResourceAttributes
     provider: str
@@ -37,18 +38,18 @@ class CallyResource:
         self.attributes = self._build_attributes(identifier, **kwargs)
 
     def __str__(self) -> str:
-        return f'${{{self.resource}.{self.attributes.id}.id}}'
+        return f'${{{self.resource}.{self.identifier}.id}}'
 
     def __getattr__(self, item: str) -> Optional[str]:
         # TODO: This likely could use some improvement
         if item.startswith('__jsii'):
             return getattr(self._instantiated_resource, item)
-        if item == 'attributes':
+        if item in {'attributes', 'defaults'}:
             return None
-        return f'${{{self.resource}.{self.attributes.id}.{item}}}'
+        return f'${{{self.resource}.{self.identifier}.{item}}}'
 
     def _get_attribute_default(self, name: str) -> Any:
-        if not hasattr(self, 'defaults'):
+        if self.defaults is None:
             return None
         return deepcopy(self.defaults.get(name, None))
 
@@ -63,10 +64,14 @@ class CallyResource:
         name = f'{self.__class__.__name__}CallyAttributes'
         cls = make_dataclass(name, fields, bases=(CallyResourceAttributes,))
         # Some newer provider releases appear to use 'id_'
-        id_field = 'id'
+        self._id_field = 'id'
         if 'id_' in parameters:
-            id_field = 'id_'
-        return cls(**{id_field: identifier, **kwargs})
+            self._id_field = 'id_'
+        return cls(**{self._id_field: identifier, **kwargs})
+
+    @property
+    def identifier(self) -> str:
+        return getattr(self.attributes, self._id_field)
 
     def construct_resource(self, scope: Construct, provider: TerraformProvider) -> None:
         self.attributes.provider = provider
