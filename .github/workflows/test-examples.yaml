@@ -20,8 +20,8 @@ jobs:
       - uses: actions/cache/restore@v3
         id: cache
         with:
-          path: build/random/dist/CallyProvidersRandom-3.6.0.tar.gz
-          key: cally-provider-random-3.6.0
+          path: build/
+          key: cally-test-providers
 
       # Cally Install
       - name: Setup Python
@@ -29,8 +29,8 @@ jobs:
         with:
           python-version: "3.11"
           cache: pip
-      - name: Install Provider Pacakge
-        run: pip install build/random/dist/CallyProvidersRandom-3.6.0.tar.gz
+      - name: Install Provider Pacakges
+        run: pip install build/**/*.tar.gz
       - name: Install Cally
         run: pip install .
 
