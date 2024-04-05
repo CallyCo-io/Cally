@@ -1,6 +1,6 @@
 import inspect
 from copy import deepcopy
-from dataclasses import dataclass, make_dataclass
+from dataclasses import dataclass, field, make_dataclass
 from importlib import import_module
 from typing import TYPE_CHECKING, Any, Dict, List, Optional
 
@@ -19,41 +19,76 @@ if TYPE_CHECKING:
 
 @dataclass
 class CallyResourceAttributes:
-    id: str
-    provider: TerraformProvider
+    _instantiated_attributes: dict = field(default_factory=dict)
+
+    def instantiate_attributes(self) -> None:
+        attrs = {}
+        for key, val in self.__dict__.items():
+            if key == '_instantiated_attributes':
+                continue
+            if hasattr(val, '_cdktf_resource'):
+                attrs.update({key: val.construct_resource()})
+                continue
+            if isinstance(val, list):
+                attrs.update(
+                    {
+                        key: [
+                            (
+                                x.construct_resource()
+                                if hasattr(x, '_cdktf_resource')
+                                else x
+                            )
+                            for x in val
+                        ]
+                    }
+                )
+                continue
+            attrs.update({key: val})
+        self._instantiated_attributes = attrs
+
+    def to_dict(self) -> dict:
+        if not self._instantiated_attributes:
+            self.instantiate_attributes()
+        return self._instantiated_attributes
 
 
 class CallyResource:
     _cdktf_resource: Any  # This is probably a callable TerraformResource
-    _id_field: str
+    _identifier: Optional[str]
     _instantiated_resource: TerraformResource
     attributes: CallyResourceAttributes
     provider: str
     resource: str
     defaults: dict
 
-    def __init__(self, identifier: str, **kwargs) -> None:
+    def __init__(self, identifier: Optional[str] = None, **kwargs) -> None:
         module = import_module(f'cally.providers.{self.provider}.{self.resource}')
         self._cdktf_resource = getattr(module, self.__class__.__name__)
         self.attributes = self._build_attributes(identifier, **kwargs)
 
     def __str__(self) -> str:
-        return f'${{{self.resource}.{self.identifier}.id}}'
+        if self.identifier:
+            return f'${{{self.resource}.{self.identifier}.id}}'
+        return self.__class__.__name__
 
     def __getattr__(self, item: str) -> Optional[str]:
         # TODO: This likely could use some improvement
         if item.startswith('__jsii'):
             return getattr(self._instantiated_resource, item)
-        if item in {'attributes', 'defaults'}:
+        if item in {'attributes', 'defaults', '_instantiated_resource'}:
             return None
-        return f'${{{self.resource}.{self.identifier}.{item}}}'
+        if self.identifier:
+            return f'${{{self.resource}.{self.identifier}.{item}}}'
+        return None
 
     def _get_attribute_default(self, name: str) -> Any:
         if self.defaults is None:
             return None
         return deepcopy(self.defaults.get(name, None))
 
-    def _build_attributes(self, identifier: str, **kwargs) -> CallyResourceAttributes:
+    def _build_attributes(
+        self, identifier: Optional[str] = None, **kwargs
+    ) -> CallyResourceAttributes:
         func = self._cdktf_resource.__init__  # type: ignore
         parameters = inspect.signature(func).parameters
         fields = [
@@ -63,21 +98,35 @@ class CallyResource:
         ]
         name = f'{self.__class__.__name__}CallyAttributes'
         cls = make_dataclass(name, fields, bases=(CallyResourceAttributes,))
-        # Some newer provider releases appear to use 'id_'
-        self._id_field = 'id'
-        if 'id_' in parameters:
-            self._id_field = 'id_'
-        return cls(**{self._id_field: identifier, **kwargs})
+        if identifier:
+            # Some newer provider releases appear to use 'id_'
+            id_field = 'id'
+            if 'id_' in parameters:
+                id_field = 'id_'
+            kwargs.update({id_field: identifier})
+        self._identifier = identifier
+        return cls(**kwargs)
 
     @property
-    def identifier(self) -> str:
-        return getattr(self.attributes, self._id_field)
+    def identifier(self) -> Optional[str]:
+        return self._identifier
 
-    def construct_resource(self, scope: Construct, provider: TerraformProvider) -> None:
-        self.attributes.provider = provider
-        self._instantiated_resource = self._cdktf_resource(
-            scope, **self.attributes.__dict__
-        )
+    def construct_resource(
+        self,
+        scope: Optional[Construct] = None,
+        provider: Optional[TerraformProvider] = None,
+    ) -> TerraformResource:
+        if getattr(self, '_instantiated_resource', None) is None:
+            attrubtes = self.attributes.to_dict()
+            if scope and provider:
+                attrubtes.update(
+                    {
+                        'scope': scope,
+                        'provider': provider,
+                    }
+                )
+            self._instantiated_resource = self._cdktf_resource(**attrubtes)
+        return self._instantiated_resource
 
 
 class CallyStack:
