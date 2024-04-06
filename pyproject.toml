@@ -41,6 +41,7 @@ development = [
 
   # docs
   "sphinx",
+  "sphinx-autobuild",
   "sphinx-issues",
   "sphinxcontrib-log-cabinet",
   "sphinx-tabs",
