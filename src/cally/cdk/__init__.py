@@ -2,11 +2,12 @@ import inspect
 from copy import deepcopy
 from dataclasses import dataclass, field, make_dataclass
 from importlib import import_module
-from typing import TYPE_CHECKING, Any, Dict, List, Optional
+from typing import TYPE_CHECKING, Any, Dict, List, Optional, Tuple
 
 from cdktf import (
     App,
     TerraformBackend,
+    TerraformOutput,
     TerraformProvider,
     TerraformResource,
     TerraformStack,
@@ -130,12 +131,16 @@ class CallyResource:
 
 
 class CallyStack:
+    _outputs: List[Tuple[str, str]]
     _providers: Dict[str, TerraformProvider]
     _resources: List[CallyResource]
     service: 'CallyStackService'
 
     def __init__(self, service: 'CallyStackService') -> None:
         self.service = service
+
+    def add_output(self, identifier: str, output: str) -> None:
+        self.outputs.append((identifier, output))
 
     def add_resource(self, resource: CallyResource) -> None:
         self.resources.append(resource)
@@ -180,6 +185,12 @@ class CallyStack:
         return self._resources
 
     @property
+    def outputs(self) -> List[Tuple[str, str]]:
+        if getattr(self, '_outputs', None) is None:
+            self._outputs = []
+        return self._outputs
+
+    @property
     def providers(self) -> Dict[str, TerraformProvider]:
         if getattr(self, '_providers', None) is None:
             self._providers = {}
@@ -197,6 +208,8 @@ class CallyStack:
                         self,
                         provider=stack.get_provider(self, resource.provider),
                     )
+                for identifier, value in stack.outputs:
+                    TerraformOutput(self, identifier, value=value)
                 stack.get_backend()(self, **stack.service.backend_config)
 
         app = App(outdir=outdir)

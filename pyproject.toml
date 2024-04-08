@@ -27,15 +27,25 @@ Issues = "https://github.com/CallyCo-io/Cally/issues"
 development = [
   "black",
   "build",
-  "coverage",
   "isort",
   "mypy",
+
+  # test
+  "coverage",
   "pytest",
   "pytest-black",
   "pytest-mypy",
   "pytest-ruff<0.3",  # 0.3 + 0.3.1 are currently not working
   "ruff",
   "types-PyYAML",
+
+  # docs
+  "sphinx",
+  "sphinx-autobuild",
+  "sphinx-issues",
+  "sphinxcontrib-log-cabinet",
+  "sphinx-tabs",
+  "Pallets-Sphinx-Themes",
 ]
 test = [
   "black",

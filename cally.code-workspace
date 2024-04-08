@@ -17,6 +17,9 @@
 			"**/.pytest_cache": true,
 			"**/.mypy_cache": true,
 			"**/.ruff_cache": true,
+			"**/build": true,
+			"**/_build": true,
+			"**/dist": true,
 			"**/*egg*": true,
 			"**/venv": true
 		},

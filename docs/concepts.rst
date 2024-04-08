@@ -69,7 +69,7 @@ Configuration
 =============
 Cally's configuration is built on top of `dynaconf <https://www.dynaconf.com/>`_ with a custom loader to
 provide a layered, consitent builder to provide a strong starting point for building your infrastructure
-from a very small amount of configuration.
+from a very small amount of configuration. Further details can be found in the :ref:`configuration` section.
 
 cally.yaml
 ----------
@@ -87,40 +87,6 @@ follows:
                 stack_vars:
                     example: variable
 
-Central Defaults
-----------------
-Often there will be certain constants, that would make sensible defaults, say provider defaults
-for `region`, or your state bucket and path name. These can be configured via a `DEFAULTS` key
-within your `cally.idp.defaults` file.
-
-.. code-block:: python
-
-    DEFAULTS = {
-        'providers': { 'google': { 'location': 'some-place1' }},
-        'backend': {
-            'type': 'GcsBackend', 'path_key': 'prefix',
-            'path': 'state-files/{environment}/{name}',
-            'config': { 'bucket': 'buckety-mc-bucketface' },
-        },
-    }
-
-Which will be available to the consuming services as required
-
-.. code-block:: shell
-
-    ✗ cally config print-service --environment dev --service pets
-    BACKEND:
-      config:
-        bucket: buckety-mc-bucketface
-      path: state-files/{environment}/{name}
-      path_key: prefix
-      type: GcsBackend
-    ENVIRONMENT: dev
-    NAME: pets
-    PROVIDERS:
-      google:
-        location: some-place1
-    STACK_TYPE: RandomPets
 
 The CDK for Terraform
 =====================
@@ -176,6 +142,8 @@ When consumed in a stack, would have an output like this:
         }
       }
     }
+
+.. _concepts-stacks:
 
 Stacks
 ------

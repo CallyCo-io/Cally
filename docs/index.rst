@@ -72,6 +72,7 @@ usage patterns.
    :maxdepth: 2
 
    concepts
+   configuration
 
 Miscellaneous Pages
 -------------------

@@ -25,3 +25,12 @@ class CallyStackTests(CallyTfTestHarness):
         self.assertDictEqual(
             result.get('terraform'), self.load_json_file('cdk/gcs_backend.json')
         )
+
+    def test_outputs(self):
+        service = self.empty_service
+        stack = CallyStack(service=service)
+        stack.add_output('test', 'output')
+        stack.add_output('foo', 'bar')
+        result = self.synth_stack(stack)
+        output = {'foo': {'value': 'bar'}, 'test': {'value': 'output'}}
+        self.assertDictEqual(result.get('output', {}), output)
