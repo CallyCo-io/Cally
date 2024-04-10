@@ -56,21 +56,21 @@ class CallyResourceAttributes:
 
 class CallyResource:
     _cdktf_resource: Any  # This is probably a callable TerraformResource
-    _identifier: Optional[str]
+    _tf_identifier: Optional[str]
     _instantiated_resource: TerraformResource
     attributes: CallyResourceAttributes
     provider: str
     resource: str
     defaults: Union[dict, MappingProxyType]
 
-    def __init__(self, identifier: Optional[str] = None, **kwargs) -> None:
+    def __init__(self, tf_identifier: Optional[str] = None, **kwargs) -> None:
         module = import_module(f'cally.providers.{self.provider}.{self.resource}')
         self._cdktf_resource = getattr(module, self.__class__.__name__)
-        self.attributes = self._build_attributes(identifier, **kwargs)
+        self.attributes = self._build_attributes(tf_identifier, **kwargs)
 
     def __str__(self) -> str:
-        if self.identifier:
-            return f'${{{self.resource}.{self.identifier}.id}}'
+        if self.tf_identifier:
+            return f'${{{self.resource}.{self.tf_identifier}.id}}'
         return self.__class__.__name__
 
     def __getattr__(self, item: str) -> Optional[str]:
@@ -79,8 +79,8 @@ class CallyResource:
             return getattr(self._instantiated_resource, item)
         if item in {'attributes', 'defaults', '_instantiated_resource'}:
             return None
-        if self.identifier:
-            return f'${{{self.resource}.{self.identifier}.{item}}}'
+        if self.tf_identifier:
+            return f'${{{self.resource}.{self.tf_identifier}.{item}}}'
         return None
 
     def _get_attribute_default(self, name: str) -> Any:
@@ -89,7 +89,7 @@ class CallyResource:
         return deepcopy(self.defaults.get(name, None))
 
     def _build_attributes(
-        self, identifier: Optional[str] = None, **kwargs
+        self, tf_identifier: Optional[str] = None, **kwargs
     ) -> CallyResourceAttributes:
         func = self._cdktf_resource.__init__  # type: ignore
         parameters = inspect.signature(func).parameters
@@ -100,18 +100,18 @@ class CallyResource:
         ]
         name = f'{self.__class__.__name__}CallyAttributes'
         cls = make_dataclass(name, fields, bases=(CallyResourceAttributes,))
-        if identifier:
+        if tf_identifier:
             # Some newer provider releases appear to use 'id_'
             id_field = 'id'
             if 'id_' in parameters:
                 id_field = 'id_'
-            kwargs.update({id_field: identifier})
-        self._identifier = identifier
+            kwargs.update({id_field: tf_identifier})
+        self._tf_identifier = tf_identifier
         return cls(**kwargs)
 
     @property
-    def identifier(self) -> Optional[str]:
-        return self._identifier
+    def tf_identifier(self) -> Optional[str]:
+        return self._tf_identifier
 
     def construct_resource(
         self,
@@ -140,8 +140,8 @@ class CallyStack:
     def __init__(self, service: 'CallyStackService') -> None:
         self.service = service
 
-    def add_output(self, identifier: str, output: str) -> None:
-        self.outputs.append((identifier, output))
+    def add_output(self, tf_identifier: str, output: str) -> None:
+        self.outputs.append((tf_identifier, output))
 
     def add_resource(self, resource: CallyResource) -> None:
         self.resources.append(resource)
@@ -209,8 +209,8 @@ class CallyStack:
                         self,
                         provider=stack.get_provider(self, resource.provider),
                     )
-                for identifier, value in stack.outputs:
-                    TerraformOutput(self, identifier, value=value)
+                for tf_identifier, value in stack.outputs:
+                    TerraformOutput(self, tf_identifier, value=value)
                 stack.get_backend()(self, **stack.service.backend_config)
 
         app = App(outdir=outdir)
