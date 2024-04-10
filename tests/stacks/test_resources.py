@@ -24,10 +24,8 @@ class CallyResourceTests(CallyTfTestHarness):
             resource = 'storage_bucket'
             defaults = MappingProxyType({'location': 'AUSTRALIA-SOUTHEAST1'})
 
-        bucket_chips = StorageBucket(identifier='bucket', name='chips')
-        bucket_fish = StorageBucket(
-            identifier='bucketo', name='fish', depends_on=[bucket_chips]
-        )
+        bucket_chips = StorageBucket('bucket', name='chips')
+        bucket_fish = StorageBucket('bucketo', name='fish', depends_on=[bucket_chips])
         stack.add_resources([bucket_chips, bucket_fish])
         result = self.synth_stack(stack)
         self.assertEqual(
@@ -52,9 +50,7 @@ class CallyResourceTests(CallyTfTestHarness):
             defaults = MappingProxyType({'location': 'AUSTRALIA-SOUTHEAST1'})
 
         stack.add_resource(
-            StorageBucket(
-                identifier='bucketo', name='fish', versioning=StorageBucketVersioning()
-            )
+            StorageBucket('bucketo', name='fish', versioning=StorageBucketVersioning())
         )
         result = self.synth_stack(stack)
         self.assertDictEqual(
@@ -91,7 +87,7 @@ class CallyResourceTests(CallyTfTestHarness):
 
         stack.add_resource(
             StorageBucket(
-                identifier='bucketo',
+                'bucketo',
                 name='fish',
                 lifecycle_rule=[
                     StorageBucketLifecycleRule(
@@ -116,4 +112,15 @@ class CallyResourceTests(CallyTfTestHarness):
                     },
                 }
             ],
+        )
+
+    def test_data_resource_reference(self):
+        class DataGoogleStorageBucket(CallyResource):
+            provider = 'google'
+            resource = 'data_google_storage_bucket'
+            defaults = MappingProxyType({'location': 'AUSTRALIA-SOUTHEAST1'})
+
+        self.assertEqual(
+            str(DataGoogleStorageBucket('bucketo', name='fish')),
+            '${data.google_storage_bucket.bucketo.id}',
         )
