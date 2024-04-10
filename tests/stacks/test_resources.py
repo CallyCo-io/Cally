@@ -113,3 +113,14 @@ class CallyResourceTests(CallyTfTestHarness):
                 }
             ],
         )
+
+    def test_data_resource_reference(self):
+        class DataGoogleStorageBucket(CallyResource):
+            provider = 'google'
+            resource = 'data_google_storage_bucket'
+            defaults = MappingProxyType({'location': 'AUSTRALIA-SOUTHEAST1'})
+
+        self.assertEqual(
+            str(DataGoogleStorageBucket('bucketo', name='fish')),
+            '${data.google_storage_bucket.bucketo.id}',
+        )

@@ -70,7 +70,7 @@ class CallyResource:
 
     def __str__(self) -> str:
         if self.tf_identifier:
-            return f'${{{self.resource}.{self.tf_identifier}.id}}'
+            return f'${{{self.tf_resource}.{self.tf_identifier}.id}}'
         return self.__class__.__name__
 
     def __getattr__(self, item: str) -> Optional[str]:
@@ -80,7 +80,7 @@ class CallyResource:
         if item in {'attributes', 'defaults', '_instantiated_resource'}:
             return None
         if self.tf_identifier:
-            return f'${{{self.resource}.{self.tf_identifier}.{item}}}'
+            return f'${{{self.tf_resource}.{self.tf_identifier}.{item}}}'
         return None
 
     def _get_attribute_default(self, name: str) -> Any:
@@ -112,6 +112,12 @@ class CallyResource:
     @property
     def tf_identifier(self) -> Optional[str]:
         return self._tf_identifier
+
+    @property
+    def tf_resource(self) -> Optional[str]:
+        if self.resource.startswith('data_'):
+            return f'data.{self.resource[5:]}'
+        return self.resource
 
     def construct_resource(
         self,
