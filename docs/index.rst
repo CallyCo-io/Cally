@@ -74,6 +74,7 @@ usage patterns.
    concepts
    configuration
    cli
+   cdk
 
 API Reference
 -------------
