@@ -74,6 +74,17 @@ usage patterns.
    concepts
    configuration
 
+API Reference
+-------------
+
+This contains the information on a specific function, class, or
+method.
+
+.. toctree::
+   :maxdepth: 2
+
+   api
+
 Miscellaneous Pages
 -------------------
 

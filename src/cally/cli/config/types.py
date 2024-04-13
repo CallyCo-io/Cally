@@ -21,6 +21,11 @@ class CallyBackend:
 
 @dataclass
 class CallyStackService(CallyService):
+    """This dataclass is automatically passed to the CallyStack class during
+    instantiation. Allowing access to any service property, though it is
+    recommended to use the documented functions.
+    """
+
     stack_type: str
     backend: CallyBackend = field(default_factory=CallyBackend)
     providers: dict = field(default_factory=dict)
@@ -44,6 +49,9 @@ class CallyStackService(CallyService):
         return self.providers.get(provider, {})
 
     def get_stack_var(self, var: str, default: Optional[Any] = None) -> Any:
+        """Any stack var, configured on the service is available via this method, with
+        the ability to provide a default.
+        """
         return self.stack_vars.get(var, default)
 
     def to_dict(self) -> dict:
