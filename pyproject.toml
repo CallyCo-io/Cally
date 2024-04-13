@@ -45,6 +45,7 @@ development = [
   "sphinx-issues",
   "sphinxcontrib-log-cabinet",
   "sphinx-tabs",
+  "sphinx-click",
   "Pallets-Sphinx-Themes",
 ]
 test = [
@@ -67,6 +68,7 @@ docs = [
   "sphinx-issues",
   "sphinxcontrib-log-cabinet",
   "sphinx-tabs",
+  "sphinx-click",
   "Pallets-Sphinx-Themes",
 ]
 

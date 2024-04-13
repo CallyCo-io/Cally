@@ -73,6 +73,7 @@ usage patterns.
 
    concepts
    configuration
+   cli
 
 API Reference
 -------------
