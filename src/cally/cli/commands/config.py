@@ -13,6 +13,7 @@ def config() -> None:
 @service_options
 @click.pass_obj
 def print_service(config: CallyConfig):
+    """Prints the service config as YAML"""
     click.secho(yaml.dump(config.settings.to_dict()))
 
 

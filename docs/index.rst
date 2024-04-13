@@ -71,8 +71,22 @@ usage patterns.
 .. toctree::
    :maxdepth: 2
 
+   why
    concepts
    configuration
+   cli
+   cdk
+
+API Reference
+-------------
+
+This contains the information on a specific function, class, or
+method.
+
+.. toctree::
+   :maxdepth: 2
+
+   api
 
 Miscellaneous Pages
 -------------------

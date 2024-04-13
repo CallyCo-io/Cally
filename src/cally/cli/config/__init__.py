@@ -71,6 +71,9 @@ def ctx_callback(
 
 
 def service_options(func):
+    """This decorator, can be used on any custom commands where you expect
+    a service and environment to be set.
+    """
     options = [
         click.option(
             '--environment',

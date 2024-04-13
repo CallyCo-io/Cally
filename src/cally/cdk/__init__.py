@@ -55,12 +55,37 @@ class CallyResourceAttributes:
 
 
 class CallyResource:
+    """This resource is for referencing the underlying CDK for Terraform resource,
+    so that it can be later instantiated. This allows us to maniuplate variables on
+    ``__init__``, along with setting defaults. Top level resources *must* be wrapped in
+    this class, and attributes with a class specification *may* be wrapped with this
+    for the purposes of setting defaults. Otherwise as long as the object structure
+    is valid for the resource, the CDK will do the RightThings :TM:, however they will
+    *not* be type checked and an output may succeed, but fail to validate/plan/apply.
+
+    :param tf_identifier: This is required for the top level resource class, and
+                          invalid for resource attributes. It is recommended to
+                          specify this as the first argument rather than as a keyword.
+                          This is expected to be a string, for consistency it should
+                          follow the Identifier requirements set out by Terraform, but
+                          the CDKTF will attempt to normalise it.
+
+    """
+
     _cdktf_resource: Any  # This is probably a callable TerraformResource
     _tf_identifier: Optional[str]
     _instantiated_resource: TerraformResource
     attributes: CallyResourceAttributes
+
+    #: Provider name, this is so cally knows where to load the underlying cdktf resource
+    #: from. For example ``random``.
     provider: str
+    #: Resource name, that cally will load the matching class name from, for example
+    #: RandomPet, lives in ``random_pet``.
     resource: str
+    #: A dictionary of the default values to set on instantion, if not passed through
+    #: as kwargs. Wrapping in a MappingProxyType avoids the mutable warnings. For
+    #: example ``MappingProxyType({'prefix': 'foo'})``
     defaults: Union[dict, MappingProxyType]
 
     def __init__(self, tf_identifier: Optional[str] = None, **kwargs) -> None:
@@ -138,6 +163,11 @@ class CallyResource:
 
 
 class CallyStack:
+    """This forms the parent of your custom stacks. It has a number of convenience
+    methods, and it is intended that you override ``__init__``, call super, and
+    construct your own stack from there.
+    """
+
     _outputs: List[Tuple[str, str]]
     _providers: Dict[str, TerraformProvider]
     _resources: List[CallyResource]
@@ -147,12 +177,17 @@ class CallyStack:
         self.service = service
 
     def add_output(self, tf_identifier: str, output: str) -> None:
+        """Adds a terraform output to the resulting generated terraform."""
         self.outputs.append((tf_identifier, output))
 
     def add_resource(self, resource: CallyResource) -> None:
+        """Adds a CallyResource to the stack, all resources must be added to the
+        stack from them to be including in the resutling output
+        """
         self.resources.append(resource)
 
     def add_resources(self, resources: List[CallyResource]) -> None:
+        """Adds a list of CallyResources to the stack"""
         self.resources.extend(resources)
 
     def get_backend(self) -> TerraformBackend:
