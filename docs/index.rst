@@ -71,6 +71,7 @@ usage patterns.
 .. toctree::
    :maxdepth: 2
 
+   why
    concepts
    configuration
    cli
