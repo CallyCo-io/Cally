@@ -1,0 +1,53 @@
+name: Build Tool Cache Archives
+
+on:
+  workflow_call:
+    inputs:
+      version:
+        type: string
+        required: true
+
+jobs:
+  build-archives:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python:
+          - "3.9"
+          - "3.10"
+          - "3.11"
+          - "3.12"
+    steps:
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+      - name: Get distribution
+        uses: actions/download-artifact@v3
+        with:
+          name: package-${{ inputs.version }}
+          path: dist
+      - name: Version
+        run: |
+          CALLY_VERSION=${{ inputs.version }}
+          PYTHON_VERSION=$(python3 -c "import sys;print(sys.version_info.minor)")
+          TOOL_CACHE_PATH="Cally-${CALLY_VERSION}-${RUNNER_OS}-${RUNNER_ARCH}-Python-3.${PYTHON_VERSION}"
+          echo "VERSION=${VERSION}" >> $GITHUB_ENV
+          echo "TOOL_CACHE_PATH=${TOOL_CACHE_PATH}" >> $GITHUB_ENV
+
+      - name: Install
+        run: |
+          pip install dist/cally-${{ inputs.version }}.tar.gz --target ${TOOL_CACHE_PATH} --ignore-installed
+          find ${TOOL_CACHE_PATH}/bin/. -type f -exec sed -i '1s/.*/#!\/usr\/bin\/env python3/' {} \;
+
+      - name: Check install
+        run: |
+          export PATH=$PATH:$(pwd)/${TOOL_CACHE_PATH}/bin
+          export PYTHONPATH=$(pwd)/${TOOL_CACHE_PATH}
+          cally --version
+
+      - name: Build asset
+        run: cd ${TOOL_CACHE_PATH} && tar -czf ../${TOOL_CACHE_PATH,,}.tar.gz .
+
+      - name: Upload asset
+        run: gh release upload v${{ inputs.version }} ${TOOL_CACHE_PATH,,}.tar.gz

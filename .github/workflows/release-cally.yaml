@@ -73,3 +73,11 @@ jobs:
           draft: false
           files: |
             dist/cally-${{ needs.build-artifact.outputs.version }}.tar.gz
+
+  build-tool-cache:
+    needs:
+      - build-artifact
+      - generate-gh-release
+    uses: ./.github/workflows/build-tool-cache.yaml
+    with:
+      version: ${{ needs.build-artifact.outputs.version }}
