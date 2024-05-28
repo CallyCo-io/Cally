@@ -53,13 +53,13 @@ jobs:
           (cd build/${{ matrix.provider }} && python -m build)
       - name: Install + check package
         run: |
-          pip install build/${{ matrix.provider }}/dist/${{ matrix.name }}-${{ matrix.version }}.tar.gz
+          pip install build/${{ matrix.provider }}/dist/*.tar.gz
           python -c 'import pkgutil,sys; sys.exit(0) if pkgutil.find_loader("cally.providers.${{ matrix.provider }}") else sys.exit(1)'
       - name: Upload Provider
         uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.provider }}-${{ matrix.name }}-${{ matrix.version }}
-          path: build/${{ matrix.provider }}/dist/${{ matrix.name }}-${{ matrix.version }}.tar.gz
+          path: build/${{ matrix.provider }}/dist/*.tar.gz
           retention-days: 1
   upload-cache:
     runs-on: ubuntu-latest
