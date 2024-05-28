@@ -51,3 +51,5 @@ jobs:
 
       - name: Upload asset
         run: gh release upload v${{ inputs.version }} ${TOOL_CACHE_PATH,,}.tar.gz
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
