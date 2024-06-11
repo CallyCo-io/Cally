@@ -1,0 +1,4 @@
+convention = "conventional"
+output = "NOTES.md"
+template = "path:.NOTES.jinja"
+sections = "feat,fix,docs,style,refactor,perf,test"
