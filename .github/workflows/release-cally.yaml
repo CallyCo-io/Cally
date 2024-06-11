@@ -34,7 +34,7 @@ jobs:
       - name: Build distribution
         run: python -m build
       - name: Save dist files
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: package-${{ steps.set-version.outputs.version }}
           path: dist
@@ -50,7 +50,7 @@ jobs:
       id-token: write
     steps:
       - name: Get distribution
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: package-${{ needs.build-artifact.outputs.version }}
           path: dist
@@ -76,7 +76,7 @@ jobs:
           PREVIOUS=$(git describe --abbrev=0 --tags $(git rev-list --tags --skip=1 --max-count=1))
           git-changelog --filter-commits ${PREVIOUS}..v${{ needs.build-artifact.outputs.version }}
       - name: Get distribution
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: package-${{ needs.build-artifact.outputs.version }}
           path: dist
