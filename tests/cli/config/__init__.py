@@ -153,14 +153,14 @@ class CallyConfigTypeTests(CallyTestHarness):
     def test_as_cally_service(self):
         config = CallyConfig(config_file='blah.yml')
         config.environment = 'test'
+        config.cally_type = 'CallyService'
         config.service = 'test'
         self.assertIsInstance(config.as_dataclass(), cally_types.CallyService)
 
     def test_as_cally_stack_service(self):
         config = CallyConfig(config_file='blah.yml')
         config.environment = 'test'
+        config.cally_type = 'CallyStackService'
         config.service = 'test'
         config.settings.stack_type = 'CallyStack'
-        self.assertIsInstance(
-            config.as_dataclass('CallyStackService'), cally_types.CallyStackService
-        )
+        self.assertIsInstance(config.as_dataclass(), cally_types.CallyStackService)

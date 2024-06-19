@@ -56,3 +56,8 @@ class CallyStackService(CallyService):
 
     def to_dict(self) -> dict:
         return asdict(self)
+
+
+@dataclass
+class CallyEnvironment:
+    environment: str

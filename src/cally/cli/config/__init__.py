@@ -1,4 +1,5 @@
 from dataclasses import fields
+from functools import update_wrapper
 from pathlib import Path
 from typing import Optional, Union
 
@@ -11,12 +12,16 @@ from .validators import BASE_CALLY_CONFIG
 
 class CallyConfig:
     config_file: Path
+    loader: str
+    cally_type: str
     _environment: Optional[str] = None
     _service: Optional[str] = None
     _settings: Dynaconf
 
     def __init__(self, config_file: Path) -> None:
         self.config_file = config_file
+        self.loader = 'cally.cli.config.loaders.service'
+        self.cally_type = 'CallyService'
 
     @property
     def environment(self) -> Optional[str]:
@@ -45,7 +50,7 @@ class CallyConfig:
                 merge_enabled=True,
                 core_loaders=[],
                 loaders=[
-                    'cally.cli.config.loader',
+                    self.loader,
                 ],
                 validators=BASE_CALLY_CONFIG,
                 cally_env=self.environment,
@@ -53,11 +58,13 @@ class CallyConfig:
             )
         return self._settings
 
-    def as_dataclass(self, cally_type='CallyService') -> cally_types.CallyService:
-        cls = getattr(cally_types, cally_type)
+    def as_dataclass(
+        self,
+    ) -> Union[cally_types.CallyService, cally_types.CallyEnvironment]:
+        cls = getattr(cally_types, self.cally_type)
         items = {
             x.name: getattr(self.settings, x.name)
-            for x in fields(cally_types.CallyStackService)
+            for x in fields(cls)
             if x.name in self.settings
         }
         return cls(**items)
@@ -95,3 +102,12 @@ def service_options(func):
     for option in reversed(options):
         func = option(func)
     return func
+
+
+def pass_stack_obj(f):
+    @click.pass_obj
+    def new_func(obj: CallyConfig, *args, **kwargs):
+        obj.cally_type = 'CallyStackService'
+        return f(obj, *args, **kwargs)
+
+    return update_wrapper(new_func, f)
