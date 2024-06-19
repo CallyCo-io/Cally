@@ -42,7 +42,7 @@ class CallyIdpTestHarness(CallyTfTestHarness):
         modules = [
             'cally.cli',
             'cally.cdk.stacks',
-            'cally.cli.config.loader',
+            'cally.cli.config.loaders.service',
             'cally.cli.config',
         ]
         for module in modules:
