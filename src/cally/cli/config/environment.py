@@ -1,22 +1,33 @@
-from abc import ABC, abstractmethod
 from dataclasses import fields
+from functools import update_wrapper
 from pathlib import Path
-from typing import Union
+from typing import Optional, Union
 
 import click
 from dynaconf import Dynaconf
 
+from . import CallyConfig, ctx_callback
 from . import types as cally_types
 from .validators import BASE_CALLY_CONFIG
 
 
-class CallyConfig(ABC):
-    config_file: Path
-    cally_type: str
+class CallyEnvironmentConfig(CallyConfig):
+    _environment: Optional[str] = None
+    _service: Optional[str] = None
     _settings: Dynaconf
+    loader = 'cally.cli.config.loaders.environment'
+    cally_type = 'CallyEnvironment'
 
     def __init__(self, config_file: Path) -> None:
         self.config_file = config_file
+
+    @property
+    def environment(self) -> Optional[str]:
+        return self._environment
+
+    @environment.setter
+    def environment(self, value: str):
+        self._environment = value
 
     @property
     def settings(self):
@@ -33,7 +44,6 @@ class CallyConfig(ABC):
                 ],
                 validators=BASE_CALLY_CONFIG,
                 cally_env=self.environment,
-                cally_service=self.service,
             )
         return self._settings
 
@@ -49,8 +59,28 @@ class CallyConfig(ABC):
         return cls(**items)
 
 
-def ctx_callback(
-    ctx: click.Context, param: click.Parameter, value: Union[str, int]
-) -> Union[str, int]:
-    setattr(ctx.obj, str(param.name), value)
-    return value
+def environment_options(func):
+    """This decorator, can be used on any custom commands where you expect
+    an environment to be set.
+    """
+    options = [
+        click.option(
+            '--environment',
+            envvar='CALLY_ENVIRONMENT',
+            expose_value=False,
+            required=True,
+            help='Environment to operate within',
+            callback=ctx_callback,
+        ),
+    ]
+    for option in reversed(options):
+        func = option(func)
+    return func
+
+
+def pass_stack_obj(f):
+    @click.pass_obj
+    def new_func(obj: CallyEnvironmentConfig, *args, **kwargs):
+        return f(obj, *args, **kwargs)
+
+    return update_wrapper(new_func, f)

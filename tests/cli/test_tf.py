@@ -2,10 +2,9 @@ import json
 import os
 from unittest import mock
 
-from click.testing import CliRunner
-
 from cally.cli.commands.tf import tf
-from cally.cli.config import CallyConfig
+from cally.cli.config.service import CallyServiceConfig
+from click.testing import CliRunner
 
 from .. import CallyTestHarness
 
@@ -17,7 +16,7 @@ class TfTests(CallyTestHarness):
         result = CliRunner().invoke(
             tf,
             ['print', '--service', 'test', '--environment', 'test'],
-            obj=CallyConfig(config_file='blah.yaml'),
+            obj=CallyServiceConfig(config_file='blah.yaml'),
         )
         self.assertEqual(result.exit_code, 0)
         testdata = {"backend": {"local": {"path": "state/test/test"}}}

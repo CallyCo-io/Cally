@@ -1,7 +1,7 @@
 import click
 import yaml
 
-from ..config import CallyConfig, service_options
+from ..config.service import CallyServiceConfig, service_options
 
 
 @click.group()
@@ -12,7 +12,7 @@ def config() -> None:
 @click.command()
 @service_options
 @click.pass_obj
-def print_service(config: CallyConfig):
+def print_service(config: CallyServiceConfig):
     """Prints the service config as YAML"""
     click.secho(yaml.dump(config.settings.to_dict()))
 

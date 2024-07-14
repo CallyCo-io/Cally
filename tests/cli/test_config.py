@@ -1,10 +1,9 @@
 import os
 from unittest import mock
 
-from click.testing import CliRunner
-
 from cally.cli.commands.config import print_service
-from cally.cli.config import CallyConfig
+from cally.cli.config.service import CallyServiceConfig
+from click.testing import CliRunner
 
 from .. import CallyTestHarness
 
@@ -15,7 +14,7 @@ class ConfigCliTests(CallyTestHarness):
         result = CliRunner().invoke(
             print_service,
             ['--service', 'test-cli', '--environment', 'test'],
-            obj=CallyConfig(config_file='blah.yaml'),
+            obj=CallyServiceConfig(config_file='blah.yaml'),
         )
         self.assertEqual(result.exit_code, 0)
         self.assertEqual(
