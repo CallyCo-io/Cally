@@ -35,7 +35,7 @@ development = [
   "pytest",
   "pytest-black",
   "pytest-mypy",
-  "pytest-ruff<0.3",  # 0.3 + 0.3.1 are currently not working
+  "pytest-ruff",
   "ruff",
   "types-PyYAML",
 
@@ -56,7 +56,7 @@ test = [
   "pytest",
   "pytest-black",
   "pytest-mypy",
-  "pytest-ruff<0.3",  # 0.3 + 0.3.1 are currently not working
+  "pytest-ruff",
   "ruff",
   "types-PyYAML",
 ]
@@ -107,7 +107,7 @@ src_paths = ["src", "tests"]
 [tool.pytest.ini_options]
 pythonpath = "src"
 testpaths = "tests"
-addopts = "-p no:cacheprovider --black --mypy --ruff"
+addopts = "--black --mypy --ruff"
 filterwarnings = [
     "ignore",
     "default:::cally.*",
