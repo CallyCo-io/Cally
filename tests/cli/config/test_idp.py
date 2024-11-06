@@ -1,4 +1,4 @@
-from cally.cli.config import CallyConfig
+from cally.cli.config.service import CallyServiceConfig
 
 from ... import CallyIdpTestHarness
 
@@ -6,7 +6,8 @@ from ... import CallyIdpTestHarness
 class CallyIdpConfigTests(CallyIdpTestHarness):
 
     def test_idp_defaults(self):
-        config = CallyConfig(config_file='blah.yaml')
+        config = CallyServiceConfig()
+        config.config_file = 'blah.yaml'
         config.environment = 'harness'
         config.service = 'idp-defaults-ya'
         data = {

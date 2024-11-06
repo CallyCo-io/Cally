@@ -80,7 +80,7 @@ skip-string-normalization = true
 
 [tool.coverage.run]
 branch = true
-omit = ["tests/*", "docs/*"]
+omit = ["tests/*", "docs/*", "*/tests/no_testdata.py"]
 
 [tool.coverage.report]
 exclude_lines = [
