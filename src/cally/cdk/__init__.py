@@ -16,7 +16,7 @@ from cdktf import (
 from constructs import Construct
 
 if TYPE_CHECKING:
-    from cally.cli.config.types import CallyStackService
+    from cally.cli.config.config_types import CallyStackService
 
 
 @dataclass

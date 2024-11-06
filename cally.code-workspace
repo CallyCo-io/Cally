@@ -12,6 +12,7 @@
 			"**/.mypy_cache": true,
 			"**/.ruff_cache": true,
 			"**/*egg*": true,
+			"**/venv": true
 		},
 		"files.watcherExclude": {
 			"**/.pytest_cache": true,

@@ -3,7 +3,7 @@ from importlib import import_module, reload
 from pathlib import Path
 
 from cally import testing
-from cally.cli.config.types import CallyStackService
+from cally.cli.config.config_types import CallyStackService
 
 
 class CallyTestHarness(testing.CallyTestHarness):
@@ -42,7 +42,7 @@ class CallyIdpTestHarness(CallyTfTestHarness):
         modules = [
             'cally.cli',
             'cally.cdk.stacks',
-            'cally.cli.config.loader',
+            'cally.cli.config.loaders.service',
             'cally.cli.config',
         ]
         for module in modules:

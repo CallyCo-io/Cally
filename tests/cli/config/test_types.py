@@ -1,4 +1,4 @@
-from cally.cli.config.types import CallyService, CallyStackService
+from cally.cli.config.config_types import CallyService, CallyStackService
 
 from .. import CallyTestHarness
 

@@ -1,0 +1,2 @@
+class ObjectNotDataclassError(Exception):
+    pass

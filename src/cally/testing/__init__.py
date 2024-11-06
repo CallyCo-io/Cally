@@ -6,7 +6,8 @@ from tempfile import TemporaryDirectory
 from unittest import TestCase, mock
 
 from cally.cdk import CallyStack
-from cally.cli.config import CallyConfig
+from cally.cli.config.service import CallyServiceConfig
+from cally.cli.config.terraform_service import CallyStackServiceConfig
 
 from .constants import HOME_ENVS
 from .exceptions import CallyTestingTestdataError
@@ -59,12 +60,30 @@ class CallyTestHarness(TestCase):
         return self._testdata
 
     @staticmethod
-    def get_cally_config(service='test', environment='cally') -> CallyConfig:
-        """Returns a CallyConfig object, with a service and environment pre-configured as
-        'test' and 'cally'"""
-        config = CallyConfig(config_file=Path('not-required.yaml'))
+    def get_cally_config(service='test', environment='cally') -> CallyServiceConfig:
+        """
+        Returns a CallyServiceConfig object, with a service and environment
+        pre-configured as 'test' and 'cally'
+        """
+        config = CallyServiceConfig()
+        config.config_file = Path('not-required.yaml')
         config.service = service
         config.environment = environment
+        return config
+
+    @staticmethod
+    def get_cally_stack_config(
+        service='test', environment='cally', stack_type='CallyStack'
+    ) -> CallyStackServiceConfig:
+        """
+        Returns a CallyStackServiceConfig object, with a service and environment
+        pre-configured as service='test', environment='cally', stack_type='CallyStack'
+        """
+        config = CallyStackServiceConfig()
+        config.config_file = Path('not-required.yaml')
+        config.service = service
+        config.environment = environment
+        config.settings.stack_type = stack_type
         return config
 
     def get_test_file(self, filename) -> Path:

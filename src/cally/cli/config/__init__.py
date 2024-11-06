@@ -1,38 +1,39 @@
-from dataclasses import fields
 from pathlib import Path
-from typing import Optional, Union
+from typing import Callable, ClassVar, Generic, List, Optional, TypeVar
 
 import click
 from dynaconf import Dynaconf
 
-from . import types as cally_types
+from . import config_types
+from .options import CALLY_CONFIG_OPTIONS
 from .validators import BASE_CALLY_CONFIG
 
+T = TypeVar(
+    "T",
+    config_types.CallyEnvironment,
+    config_types.CallyProject,
+    config_types.CallyService,
+    config_types.CallyStackService,
+)
 
-class CallyConfig:
-    config_file: Path
-    _environment: Optional[str] = None
-    _service: Optional[str] = None
+
+class CallyConfig(Generic[T]):
+    CALLY_TYPE: ClassVar[Callable]
+    _config_file: Path
+    _config: T
     _settings: Dynaconf
 
-    def __init__(self, config_file: Path) -> None:
-        self.config_file = config_file
+    @property
+    def config_file(self) -> Optional[Path]:
+        return self._config_file
+
+    @config_file.setter
+    def config_file(self, value: Path):
+        self._config_file = value
 
     @property
-    def environment(self) -> Optional[str]:
-        return self._environment
-
-    @environment.setter
-    def environment(self, value: str):
-        self._environment = value
-
-    @property
-    def service(self) -> Optional[str]:
-        return self._service
-
-    @service.setter
-    def service(self, value: str):
-        self._service = value
+    def _settings_kwargs(self) -> dict:
+        return {'loaders': []}
 
     @property
     def settings(self):
@@ -44,54 +45,37 @@ class CallyConfig:
                 settings_file=self.config_file,
                 merge_enabled=True,
                 core_loaders=[],
-                loaders=[
-                    'cally.cli.config.loader',
-                ],
                 validators=BASE_CALLY_CONFIG,
-                cally_env=self.environment,
-                cally_service=self.service,
+                **self._settings_kwargs,
             )
         return self._settings
 
-    def as_dataclass(self, cally_type='CallyService') -> cally_types.CallyService:
-        cls = getattr(cally_types, cally_type)
-        items = {
-            x.name: getattr(self.settings, x.name)
-            for x in fields(cally_types.CallyStackService)
-            if x.name in self.settings
-        }
-        return cls(**items)
+    @property
+    def config(
+        self,
+    ) -> T:
+        if getattr(self, '_config', None) is None:
+            self._config = self.CALLY_TYPE(
+                **config_types.filter_dataclass_props(self.settings, self.CALLY_TYPE)
+            )
+        return self._config
 
 
-def ctx_callback(
-    ctx: click.Context, param: click.Parameter, value: Union[str, int]
-) -> Union[str, int]:
-    setattr(ctx.obj, str(param.name), value)
-    return value
+class CallyConfigContext(click.Context):
+    def __init__(self, *args, **kwargs) -> None:
+        if kwargs.get('obj', None) is None:
+            kwargs.update(obj=CallyConfig())
+        super().__init__(*args, **kwargs)
 
 
-def service_options(func):
-    """This decorator, can be used on any custom commands where you expect
-    a service and environment to be set.
-    """
-    options = [
-        click.option(
-            '--environment',
-            envvar='CALLY_ENVIRONMENT',
-            expose_value=False,
-            required=True,
-            help='Environment to operate within',
-            callback=ctx_callback,
-        ),
-        click.option(
-            '--service',
-            envvar='CALLY_SERVICE',
-            expose_value=False,
-            required=True,
-            help='Service name to retrieve config details',
-            callback=ctx_callback,
-        ),
-    ]
-    for option in reversed(options):
-        func = option(func)
-    return func
+class CallyCommandClass(click.Command):
+    context_class = CallyConfigContext
+    default_cally_options: List[click.Option] = CALLY_CONFIG_OPTIONS
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.params.extend(self.default_cally_options)
+
+
+def CallyCommand():  # noqa: N802
+    return CallyCommandClass
