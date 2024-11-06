@@ -1,9 +1,8 @@
 from pathlib import Path
 
-
 import click
 
-from ..config import CallyConfig, service_options
+from ..config.terraform_service import CallyStackServiceCommand, CallyStackServiceConfig
 from ..tools import terraform
 
 
@@ -12,11 +11,10 @@ def tf() -> None:
     pass
 
 
-@click.command(name='print')
-@service_options
+@click.command(name='print', cls=CallyStackServiceCommand())
 @click.pass_obj
-def print_template(config: CallyConfig):
-    with terraform.Action(service=config.as_dataclass('CallyStackService')) as action:
+def print_template(config: CallyStackServiceConfig):
+    with terraform.Action(service=config.config) as action:
         click.secho(action.print())
 
 
@@ -27,10 +25,9 @@ def print_template(config: CallyConfig):
     default=Path(Path.cwd(), 'cdk.tf.json'),
     help='Output path for the terraform json',
 )
-@service_options
 @click.pass_obj
-def write_template(config: CallyConfig, output: Path):
-    with terraform.Action(service=config.as_dataclass('CallyStackService')) as action:
+def write_template(config: CallyStackServiceConfig, output: Path):
+    with terraform.Action(service=config.config) as action:
         output.write_text(action.print())
         click.secho(f'Template written to {output}')
 

@@ -6,7 +6,7 @@ from typing import Type
 
 from cally.cdk import stacks
 
-from ..config.types import CallyStackService
+from ..config.config_types import CallyStackService
 
 
 class Action:

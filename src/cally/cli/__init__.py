@@ -31,20 +31,11 @@ def get_commands(package_name: str) -> List:
 
 
 @click.group()
-@click.option(
-    '--config',
-    type=click.Path(path_type=Path),
-    default=Path(Path.cwd(), 'cally.yaml'),
-    envvar='CALLY_CONFIG',
-    help='Path to the project config file',
-)
 @click.version_option(__version__)
-@click.pass_context
-def cally(ctx: click.Context, config: Path) -> None:
+def cally() -> None:
     """
     Top level click command group for Cally
     """
-    ctx.obj = CallyConfig(config_file=config)
 
 
 commands = get_commands('cally.cli.commands')

@@ -1,9 +1,22 @@
-from dataclasses import asdict, dataclass, field
+from dataclasses import asdict, dataclass, field, fields, is_dataclass
 from typing import Any, Optional
+
+from ..exceptions import ObjectNotDataclassError
+
+
+def filter_dataclass_props(data: dict, cls: Any) -> dict:
+    if not is_dataclass(cls):
+        raise ObjectNotDataclassError(f'{cls} is not of type dataclass')
+    return {x.name: data.get(x.name) for x in fields(cls) if x.name in data}
 
 
 @dataclass
-class CallyService:
+class CallyProject:
+    pass
+
+
+@dataclass
+class CallyService(CallyProject):
     name: str
     environment: str
 
@@ -56,3 +69,8 @@ class CallyStackService(CallyService):
 
     def to_dict(self) -> dict:
         return asdict(self)
+
+
+@dataclass
+class CallyEnvironment(CallyProject):
+    environment: str
