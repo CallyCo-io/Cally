@@ -11,13 +11,31 @@
 {%- endfor -%}
 {%- endmacro -%}
 
+{#- macro: breaking_changes -#}
+{%- macro breaking_changes(commit) -%}
+{% set ns = namespace(found=false) %}
+  **BREAKING CHANGES**:
+{%- for line in commit.body -%}
+{% if ns.found %}
+  {{ line }}
+{%- endif -%}
+{%- if 'BREAKING CHANGES:' in line -%}
+{%- set ns.found = true -%}
+{%- endif -%}
+{%- endfor -%}
+{%- endmacro -%}
+
 {#- macro: render_section -#}
 {%- macro render_section(section) -%}
 ### {{ section.type or "Misc" }}
 
 {% for commit in section.commits|sort(attribute='author_date',reverse=true)|unique(attribute='subject') -%}
 {{ render_commit(commit) }}
+{%- if 'BREAKING CHANGES:' in commit.body -%}
+{{ breaking_changes(commit) }}
+{% endif %}
 {% endfor %}
+
 {%- endmacro -%}
 
 {%- macro render_version(version) -%}
