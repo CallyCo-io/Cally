@@ -18,7 +18,7 @@ def print_template(config: CallyStackServiceConfig):
         click.secho(action.print())
 
 
-@click.command(name='write')
+@click.command(name='write', cls=CallyStackServiceCommand())
 @click.option(
     '--output',
     type=click.Path(path_type=Path),
