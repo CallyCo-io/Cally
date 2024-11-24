@@ -23,6 +23,11 @@ jobs:
         with:
           python-version: "3.11"
           cache: pip
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_wrapper: false
+      - name: Export Terraform Path
+        run: echo "CALLY_TERRAFORM_PATH=$(which terraform)" >> $GITHUB_ENV
       - name: Install Provider Pacakges
         run: pip install build/**/*.tar.gz
       - name: Install Cally test dependencies

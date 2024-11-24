@@ -141,3 +141,7 @@ select = [
     "S404",  # `subprocess` module is possibly insecure - used for 'cdktf get'
     "S602"  # `subprocess` call with `shell=True` identified - required for 'cdktf get'
 ]
+"src/cally/cli/tools/terraform.py" = [
+    "S404",  # `subprocess` module is possibly insecure - used for 'terraform x'
+    "S603",  # `subprocess` call: check for execution of untrusted input - CLI wrapper is expected to take these inputs
+]
