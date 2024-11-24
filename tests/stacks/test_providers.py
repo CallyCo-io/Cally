@@ -41,19 +41,3 @@ class CallyProviderTests(CallyTfTestHarness):
         self.assertEqual(
             result.get('provider', {}).get('random', {})[0].get('alias', ''), 'foo'
         )
-
-    def test_resource_identifier(self):
-        class Pet(CallyResource):
-            provider = 'random'
-            resource = 'pet'
-
-        self.assertEqual('${pet.random-pet.id}', str(Pet('random-pet')))
-
-    def test_resource_identifier_underscore(self):
-        class PubsubTopic(CallyResource):
-            provider = 'google'
-            resource = 'pubsub_topic'
-
-        self.assertEqual(
-            '${pubsub_topic.random-topic.id}', str(PubsubTopic('random-topic'))
-        )

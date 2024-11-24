@@ -114,7 +114,7 @@ class CallyResourceTests(CallyTfTestHarness):
             ],
         )
 
-    def test_data_resource_reference(self):
+    def test_data_resource_reference_id(self):
         class DataGoogleStorageBucket(CallyResource):
             provider = 'google'
             resource = 'data_google_storage_bucket'
@@ -123,4 +123,46 @@ class CallyResourceTests(CallyTfTestHarness):
         self.assertEqual(
             str(DataGoogleStorageBucket('bucketo', name='fish')),
             '${data.google_storage_bucket.bucketo.id}',
+        )
+
+    def test_data_resource_reference(self):
+        class DataGoogleStorageBucket(CallyResource):
+            provider = 'google'
+            resource = 'data_google_storage_bucket'
+            defaults = MappingProxyType({'location': 'AUSTRALIA-SOUTHEAST1'})
+
+        self.assertEqual(
+            DataGoogleStorageBucket('bucketo', name='fish').name,
+            '${data.google_storage_bucket.bucketo.name}',
+        )
+
+    def test_resource_reference_id(self):
+        class StorageBucket(CallyResource):
+            provider = 'google'
+            resource = 'storage_bucket'
+            defaults = MappingProxyType({'location': 'AUSTRALIA-SOUTHEAST1'})
+
+        self.assertEqual(
+            str(StorageBucket('bucketo', name='fish')),
+            '${google_storage_bucket.bucketo.id}',
+        )
+
+    def test_resource_reference(self):
+        class StorageBucket(CallyResource):
+            provider = 'google'
+            resource = 'storage_bucket'
+            defaults = MappingProxyType({'location': 'AUSTRALIA-SOUTHEAST1'})
+
+        self.assertEqual(
+            StorageBucket('bucketo', name='fish').name,
+            '${google_storage_bucket.bucketo.name}',
+        )
+
+    def test_resource_reference_underscore(self):
+        class PubsubTopic(CallyResource):
+            provider = 'google'
+            resource = 'pubsub_topic'
+
+        self.assertEqual(
+            '${google_pubsub_topic.random-topic.id}', str(PubsubTopic('random-topic'))
         )

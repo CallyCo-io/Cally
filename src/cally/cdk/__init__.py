@@ -94,8 +94,10 @@ class CallyResource:
         self.attributes = self._build_attributes(tf_identifier, **kwargs)
 
     def __str__(self) -> str:
-        if self.tf_identifier:
+        if self.tf_identifier and self.tf_data_resource:
             return f'${{{self.tf_resource}.{self.tf_identifier}.id}}'
+        if self.tf_identifier:
+            return f'${{{self.provider}_{self.tf_resource}.{self.tf_identifier}.id}}'
         return self.__class__.__name__
 
     def __getattr__(self, item: str) -> Optional[str]:
@@ -104,8 +106,12 @@ class CallyResource:
             return getattr(self._instantiated_resource, item)
         if item in {'attributes', 'defaults', '_instantiated_resource'}:
             return None
-        if self.tf_identifier:
+        if self.tf_identifier and self.tf_data_resource:
             return f'${{{self.tf_resource}.{self.tf_identifier}.{item}}}'
+        if self.tf_identifier:
+            return (
+                f'${{{self.provider}_{self.tf_resource}.{self.tf_identifier}.{item}}}'
+            )
         return None
 
     def _get_attribute_default(self, name: str) -> Any:
@@ -133,6 +139,10 @@ class CallyResource:
             kwargs.update({id_field: tf_identifier})
         self._tf_identifier = tf_identifier
         return cls(**kwargs)
+
+    @property
+    def tf_data_resource(self) -> bool:
+        return self.resource.startswith('data_')
 
     @property
     def tf_identifier(self) -> Optional[str]:
