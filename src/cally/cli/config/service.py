@@ -24,6 +24,20 @@ class CallyServiceConfigContext(click.Context):
 
 
 def CallyServiceCommand():  # noqa: N802
+    """This can be applied to the 'cls' kwarg of a click.command decorator. It
+    will make all service options available to the decorated command. Best combined
+    with the pass object decorator for convenient access to the CallyServiceConfig
+    object.
+
+    Example usage::
+
+        @click.command(name='print', cls=CallyServiceCommand())
+        @click.pass_obj
+        def example(service: CallyServiceConfig):
+            click.echo(service.config.name)
+
+    """
+
     class CallyServiceCommandClass(CallyCommandClass):
         context_class = CallyServiceConfigContext
         default_cally_options = CALLY_SERVICE_OPTIONS

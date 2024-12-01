@@ -18,10 +18,10 @@ CDK
 Config
 ------
 
-.. autoclass:: cally.cli.config.types.CallyStackService
+.. autoclass:: cally.cli.config.config_types.CallyStackService
     :members:
 
-.. autofunction:: cally.cli.config.service_options
+.. autofunction:: cally.cli.config.service.CallyServiceCommand
 
 
 Testing
