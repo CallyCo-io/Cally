@@ -14,6 +14,8 @@ jobs:
     strategy:
       matrix:
         project: ["minimal", "opinionated"]
+    env:
+      UV_SYSTEM_PYTHON: true
     steps:
       # Restore Provider Packages
       - uses: actions/checkout@v4
@@ -29,10 +31,11 @@ jobs:
         with:
           python-version: "3.11"
           cache: pip
+      - uses: yezz123/setup-uv@v4
       - name: Install Provider Pacakges
-        run: pip install build/**/*.tar.gz
+        run: uv pip install build/**/*.tar.gz
       - name: Install Cally
-        run: pip install .
+        run: uv pip install .
 
       # IDP Install
       - uses: actions/checkout@v4
@@ -41,7 +44,7 @@ jobs:
           path: examples
       - name: Install ${{ matrix.project }}
         working-directory: examples/${{ matrix.project }}
-        run: pip install .[test]
+        run: uv pip install .[test]
 
       # Run Tests
       - name: Run Pytest for ${{ matrix.project }}
