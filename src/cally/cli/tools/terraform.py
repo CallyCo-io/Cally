@@ -58,12 +58,37 @@ class Action:
 
 class Command:
     arguments: Tuple[str, ...]
+    service: CallyStackService
     terraform_path: str
+    terraform_cache: Path
     _result: subprocess.CompletedProcess
 
-    def __init__(self, terraform_path: str, arguments: Tuple[str, ...]) -> None:
+    def __init__(
+        self,
+        service: CallyStackService,
+        terraform_path: str,
+        terraform_cache: Path,
+        arguments: Tuple[str, ...],
+    ) -> None:
         self.terraform_path = terraform_path
+        self.terraform_cache = terraform_cache
         self.arguments = arguments
+        self.service = service
+
+    def __enter__(self) -> 'Action':
+        self._cache_dir = Path(self.terraform_cache, self.service.name)
+        self._cache_dir.mkdir(exist_ok=True)
+        self._cwd = Path().cwd()
+        os.chdir(self._cache_dir)
+        return self
+
+    def __exit__(
+        self,
+        exc_type: Type[BaseException],
+        exc_value: BaseException,
+        traceback: TracebackType,
+    ) -> None:
+        os.chdir(self._cwd)
 
     @property
     def result(self) -> subprocess.CompletedProcess:
