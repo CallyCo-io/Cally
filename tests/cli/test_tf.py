@@ -1,7 +1,7 @@
 import json
 import os
 from pathlib import Path
-from unittest import mock
+from unittest import mock, skipUnless
 
 from click.testing import CliRunner
 
@@ -9,8 +9,10 @@ from cally.cli.commands.tf import tf
 
 from .. import CallyTestHarness
 
+SKIP_TESTS = Path(os.environ.get('CALLY_TERRAFORM_PATH', '.not-set')).is_file()
 
-class TfTests(CallyTestHarness):
+
+class TfActionTests(CallyTestHarness):
 
     @mock.patch.dict(os.environ, {"CALLY_STACK_TYPE": "CallyStack"})
     def test_empty_print(self):
@@ -45,4 +47,30 @@ class TfTests(CallyTestHarness):
         self.assertDictEqual(
             json.loads(data.read_text(encoding='utf8')).get('terraform'),
             testdata,
+        )
+
+
+@skipUnless(SKIP_TESTS, "CALLY_TERRAFORM_PATH must be set and valid")
+@mock.patch.dict(
+    os.environ,
+    {
+        "CALLY_TERRAFORM_PATH": os.environ.get('CALLY_TERRAFORM_PATH', '.not-set'),
+        "CALLY_STACK_TYPE": "CallyStack",
+    },
+)
+class TfCommandTests(CallyTestHarness):
+    def test_terraform_version(self):
+        result = CliRunner().invoke(
+            tf, ['run', 'version', '--environment', 'test', '--service', 'test']
+        )
+        self.assertEqual(result.exit_code, 0)
+        self.assertTrue(result.output.startswith('Terraform v'))
+
+    def test_terraform_error(self):
+        result = CliRunner().invoke(
+            tf, ['run', 'invalid-foo', '--environment', 'test', '--service', 'test']
+        )
+        self.assertEqual(result.exit_code, 1)
+        self.assertTrue(
+            result.output.startswith('Terraform has no command named "invalid-foo".')
         )

@@ -1,8 +1,9 @@
 import os
+import subprocess
 from pathlib import Path
 from tempfile import TemporaryDirectory
 from types import TracebackType
-from typing import Type
+from typing import Tuple, Type
 
 from cally.cdk import stacks
 
@@ -53,3 +54,39 @@ class Action:
     def print(self) -> str:
         self.synth_stack()
         return self.output_file.read_text()
+
+
+class Command:
+    arguments: Tuple[str, ...]
+    terraform_path: str
+    _result: subprocess.CompletedProcess
+
+    def __init__(self, terraform_path: str, arguments: Tuple[str, ...]) -> None:
+        self.terraform_path = terraform_path
+        self.arguments = arguments
+
+    @property
+    def result(self) -> subprocess.CompletedProcess:
+        if getattr(self, '_result', None) is None:
+            self._result = subprocess.run(
+                args=[self.terraform_path, *self.arguments],
+                capture_output=True,
+                check=False,
+            )
+        return self._result
+
+    @property
+    def success(self) -> bool:
+        return self.result.returncode == 0
+
+    @property
+    def returncode(self) -> int:
+        return self.result.returncode
+
+    @property
+    def stderr(self) -> int:
+        return self.result.stderr
+
+    @property
+    def stdout(self) -> int:
+        return self.result.stdout
