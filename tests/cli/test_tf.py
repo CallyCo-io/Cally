@@ -59,6 +59,17 @@ class TfActionTests(CallyTestHarness):
     },
 )
 class TfCommandTests(CallyTestHarness):
+    def setUp(self):
+        super().setUp()
+        self.env_patcher = mock.patch.dict(
+            os.environ,
+            {
+                **self.env_patcher.values,
+                "CALLY_TERRAFORM_CACHE": Path(self.working.name, '.cache').as_posix(),
+            },
+        )
+        self.env_patcher.start()
+
     def test_terraform_version(self):
         result = CliRunner().invoke(
             tf, ['run', 'version', '--environment', 'test', '--service', 'test']
@@ -73,4 +84,12 @@ class TfCommandTests(CallyTestHarness):
         self.assertEqual(result.exit_code, 1)
         self.assertTrue(
             result.output.startswith('Terraform has no command named "invalid-foo".')
+        )
+
+    def test_cached_output(self):
+        CliRunner().invoke(
+            tf, ['run', 'version', '--environment', 'test', '--service', 'test']
+        )
+        self.assertTrue(
+            Path(Path.home().as_posix(), '.cache', 'test', 'cdk.tf.json').exists()
         )
